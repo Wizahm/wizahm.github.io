@@ -404,8 +404,53 @@
   lnk.href = C.linkedin;
   em.href = "mailto:" + email; em.title = email;
   ph.href = "tel:" + phone; ph.title = C.phoneParts.join(" ");
-  [[lnk, "linkedin"], [em, "email"], [ph, "phone"]].forEach(([el, m]) =>
+  [[lnk, "linkedin"], [ph, "phone"]].forEach(([el, m]) =>
     el.addEventListener("click", () => track("contact_click", { method: m, from: current ? current.id : "me" })));
+
+  /* Email menu: a plain mailto link does nothing for people without a desktop email app,
+     so offer Gmail and Outlook on the web as well, plus copy-to-clipboard. */
+  const subj = encodeURIComponent("Hello from your portfolio");
+  const emailMenu = document.createElement("div");
+  emailMenu.className = "menu card";
+  emailMenu.id = "emailMenu";
+  emailMenu.hidden = true;
+  emailMenu.setAttribute("role", "menu");
+  emailMenu.innerHTML = `
+    <p class="menu-addr">${esc(email)}</p>
+    <a role="menuitem" data-m="gmail" target="_blank" rel="noopener" href="https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(email)}&su=${subj}">Write in Gmail</a>
+    <a role="menuitem" data-m="outlook" target="_blank" rel="noopener" href="https://outlook.office.com/mail/deeplink/compose?to=${encodeURIComponent(email)}&subject=${subj}">Write in Outlook</a>
+    <a role="menuitem" data-m="mailapp" href="mailto:${email}?subject=${subj}">Open my email app</a>
+    <button role="menuitem" type="button" data-m="copy">Copy address</button>`;
+  document.querySelector(".topbar").appendChild(emailMenu);
+  em.href = "mailto:" + email; em.title = email;
+  em.setAttribute("aria-haspopup", "menu");
+  em.setAttribute("aria-expanded", "false");
+  const toggleEmailMenu = (open) => {
+    emailMenu.hidden = !open;
+    em.setAttribute("aria-expanded", String(open));
+    if (open) emailMenu.querySelector("a").focus({ preventScroll: true });
+  };
+  em.addEventListener("click", (e) => {
+    e.preventDefault();
+    toggleEmailMenu(emailMenu.hidden);
+    if (!emailMenu.hidden) track("contact_click", { method: "email", from: current ? current.id : "me" });
+  });
+  emailMenu.addEventListener("click", async (e) => {
+    const item = e.target.closest("[data-m]");
+    if (!item) return;
+    track("email_choice", { via: item.dataset.m });
+    if (item.dataset.m === "copy") {
+      try { await navigator.clipboard.writeText(email); item.textContent = "Copied ✓"; }
+      catch (_) { item.textContent = email; }
+      setTimeout(() => { item.textContent = "Copy address"; toggleEmailMenu(false); }, 1400);
+      return;
+    }
+    setTimeout(() => toggleEmailMenu(false), 150);
+  });
+  document.addEventListener("click", (e) => {
+    if (!emailMenu.hidden && !emailMenu.contains(e.target) && !em.contains(e.target)) toggleEmailMenu(false);
+  });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !emailMenu.hidden) { toggleEmailMenu(false); em.focus(); } });
 
   /* ── Intro card ── */
   $("#introName").textContent = S.person.name;
