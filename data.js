@@ -13,7 +13,7 @@ window.SITE = {
     tagline: "Recent graduate, MSc Entrepreneurship & Innovation, Trinity College Dublin",
     intro:
       "Strategy, consulting and business development. I've worked and studied in Jordan, Germany and Ireland, and I speak Arabic, English and German.",
-    location: "Dublin · Available immediately · Stamp 1G, no sponsorship needed",
+    location: "Dublin · Available immediately · Stamp 1G",
     // Landing intro shown before the web fades in
     splash: {
       hello: "Hi, I'm Wisam.",
