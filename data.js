@@ -17,7 +17,7 @@ window.SITE = {
     // Landing intro shown before the web fades in
     splash: {
       hello: "Hi, I'm Wisam.",
-      lead: "Recent Trinity College Dublin graduate · MSc Entrepreneurship & Innovation (2:1)",
+      lead: "Recent Trinity College Dublin graduate · MSc Entrepreneurship & Innovation (2,1)",
       lines: [
         "I turn research and people's needs into clear, practical strategy.",
         "In Jordan, I assessed whether five companies' products were ready for export and designed the scoring framework my firm adopted. In Dublin, I built a funding strategy for a family resource centre and designed ventures for international students and energy-poor households."
@@ -38,6 +38,7 @@ window.SITE = {
       id: "about",
       label: "About me",
       theme: "gold",
+      shape: "hexagon",
       summary:
         "A recent Trinity graduate with an international background, a business-family upbringing and a habit of taking ownership early.",
       items: [
@@ -107,17 +108,18 @@ window.SITE = {
     {
       id: "education",
       label: "Education",
-      theme: "ivory",
+      theme: "emerald",
+      shape: "diamond",
       summary: "Three countries, three languages, one thread: business across cultures.",
       items: [
         {
           id: "tcd",
           label: "Trinity College Dublin",
-          theme: "ivory",
+          theme: "emerald",
           title: "MSc Entrepreneurship & Innovation",
           meta: "Trinity College Dublin · Sep 2025 – Jun 2026 · Recent graduate",
           bullets: [
-            "Awarded Second Class Honours, Grade 1 (2:1).",
+            "Awarded Second Class Honours, Grade 1 (2,1).",
             "Capstone consulting project with a real client, graded 75%.",
             "Modules: Business Model Innovation, Design Thinking & Agile, Digital Entrepreneurship & Scaling, Strategic, International, Social and Financial Entrepreneurship, Corporate Innovation, New Venture Creation.",
             "Pitched ventures and strategies to panels throughout the year."
@@ -128,7 +130,7 @@ window.SITE = {
         {
           id: "gju",
           label: "German Jordanian University",
-          theme: "ivory",
+          theme: "emerald",
           title: "B.A. German & English for Business and Communication",
           meta: "German Jordanian University · 2017 – 2022",
           bullets: [
@@ -140,7 +142,7 @@ window.SITE = {
         {
           id: "magdeburg",
           label: "Exchange in Germany",
-          theme: "ivory",
+          theme: "emerald",
           title: "Exchange year",
           meta: "Magdeburg-Stendal University of Applied Sciences · Apr – Sep 2021",
           bullets: ["One semester of study, then one semester interning in Germany."],
@@ -149,7 +151,7 @@ window.SITE = {
         {
           id: "certs",
           label: "Certifications",
-          theme: "ivory",
+          theme: "emerald",
           title: "Certifications",
           meta: "Yale · ITC Academy",
           bullets: [
@@ -167,6 +169,7 @@ window.SITE = {
       id: "experience",
       label: "Experience",
       theme: "lapis",
+      shape: "octagon",
       summary:
         "Consulting, sales and talent roles in Jordan and Germany.",
       items: [
@@ -263,14 +266,15 @@ window.SITE = {
     {
       id: "projects",
       label: "Projects",
-      theme: "turquoise",
+      theme: "coral",
+      shape: "square",
       summary:
         "My MSc capstone with a real client, plus ventures and analyses from my coursework. All were team projects except the Steeple valuation.",
       items: [
         {
           id: "rosemount",
           label: "Rosemount capstone",
-          theme: "lapis",
+          theme: "coral",
           title: "Capstone consulting project: funding strategy",
           meta: "MSc capstone (part of my Master's) · Rosemount Family Resource Centre, Dundrum · May – Jul 2026",
           body: [
@@ -288,7 +292,7 @@ window.SITE = {
         {
           id: "gradguides",
           label: "Grad Guides",
-          theme: "sky",
+          theme: "coral",
           title: "Grad Guides: alumni mentors for international students",
           meta: "Digital Entrepreneurship & Scaling · team of four",
           body: [
@@ -306,7 +310,7 @@ window.SITE = {
         {
           id: "dealio",
           label: "Dealio",
-          theme: "amber",
+          theme: "coral",
           title: "Dealio: verified student deals, made by international students",
           meta: "International Entrepreneurship · team project + my own entry-strategy report",
           body: [
@@ -324,7 +328,7 @@ window.SITE = {
         {
           id: "energy",
           label: "Fair Energy Navigator",
-          theme: "teal",
+          theme: "coral",
           title: "Fair Energy Navigator: no household left behind",
           meta: "Social & Sustainable Entrepreneurship · team pitch to a mock investment committee",
           body: [
@@ -337,13 +341,13 @@ window.SITE = {
             "We deliberately ruled out charging households and taking contractor commissions, both of which would conflict with the mission.",
             "Scaling works through a hub-and-spoke model: a small central team runs the platform, training and data, while local partners (local authorities, housing bodies, family resource centres) handle outreach and trust."
           ],
-          tags: ["Social enterprise", "Theory of change", "Outcome contracts", "Scaling", "Funding mix"],
+          tags: ["Social enterprise", "Theory of Change", "Outcome contracts", "Scaling", "Funding mix"],
           links: ["rosemount", "s-strategy"]
         },
         {
           id: "steeple",
           label: "Steeple Group valuation",
-          theme: "navy",
+          theme: "coral",
           title: "Steeple Group: financially strong, commercially under-accelerated",
           meta: "Financing Entrepreneurship · individual analysis",
           body: [
@@ -365,16 +369,17 @@ window.SITE = {
     {
       id: "skills",
       label: "Skills",
-      theme: "cobalt",
+      theme: "violet",
+      shape: "pentagon",
       summary: "What I bring to a team, and where each skill was earned.",
       items: [
         {
           id: "s-strategy",
           label: "Strategy & analysis",
-          theme: "cobalt",
+          theme: "violet",
           title: "Strategy & framework-driven analysis",
           bullets: [
-            "Porter's Five Forces, PESTEL / STEEPLE, Hofstede, Business Model Canvas, theory of change.",
+            "Porter's Five Forces, PESTEL / STEEPLE, Hofstede, Business Model Canvas, Theory of Change.",
             "Funding and business cases, valuation and ratio analysis.",
             "Export-readiness diagnostics and scoring frameworks."
           ],
@@ -383,7 +388,7 @@ window.SITE = {
         {
           id: "s-digital",
           label: "Digital marketing",
-          theme: "cobalt",
+          theme: "violet",
           title: "Digital marketing & growth",
           bullets: [
             "Google Ads, Meta and Instagram ad accounts, on-page SEO, Google Analytics.",
@@ -394,7 +399,7 @@ window.SITE = {
         {
           id: "s-sales",
           label: "Sales & clients",
-          theme: "cobalt",
+          theme: "violet",
           title: "Sales & client relationships",
           bullets: [
             "Outbound prospecting, consultative selling and managing a client portfolio.",
@@ -405,7 +410,7 @@ window.SITE = {
         {
           id: "s-research",
           label: "Research & communication",
-          theme: "cobalt",
+          theme: "violet",
           title: "Research, presenting & communication",
           bullets: [
             "Market research, customer interviews, surveys and user testing.",
@@ -418,7 +423,7 @@ window.SITE = {
         {
           id: "s-tools",
           label: "Tools",
-          theme: "cobalt",
+          theme: "violet",
           title: "Tools I use",
           bullets: [
             "Microsoft Excel: financial modelling, ratio analysis and tracking.",
@@ -431,7 +436,7 @@ window.SITE = {
         {
           id: "s-lang",
           label: "Languages",
-          theme: "cobalt",
+          theme: "violet",
           title: "Languages",
           bullets: ["Arabic (native)", "English (fluent)", "German (conversational)"],
           links: ["ssip", "gju"]
@@ -449,4 +454,70 @@ window.SITE = {
     "Startup valuation",
     "Working with me"
   ]
+};
+
+/*
+  PHOTOS: one general stock photo per subtopic, free under the Unsplash License
+  (https://unsplash.com/license). Each is credited in the panel. To change one, find a photo
+  on unsplash.com and paste its image id ("photo-...") as src, the photographer's username as user,
+  and the photo's page slug as page.
+*/
+window.SITE.photos = {
+  story:        { src: "photo-1614772067419-1452cf9aeaa3", user: "hisham_zayadneh", page: "white-and-brown-concrete-buildings-during-daytime-cKdPnDMmpH8", alt: "Hillside buildings in Amman, Jordan" },
+  drive:        { src: "photo-1504607798333-52a30db54a5d", user: "codzilla_swiss", page: "shallow-focus-photograph-of-black-and-gray-compass-uCMKx2H1Y38", alt: "A compass" },
+  next:         { src: "photo-1772620461831-7c14a2a1f50e", user: "asantoro90", page: "modern-bridge-over-a-wide-river-in-a-city-MqJosbD2PEw", alt: "A modern bridge over a river in a city" },
+  interests:    { src: "photo-1776847651583-1d804b5cc339", user: "gabigi", page: "archery-targets-with-arrows-in-the-bullseye-DXGtmrGmmJI", alt: "Archery targets with arrows in the bullseye" },
+  tcd:          { src: "photo-1530608031805-8e170c1b793a", user: "jbsinger1970", page: "library-interioe-NgU7IJ5XuyY", alt: "A grand library interior" },
+  gju:          { src: "photo-1758270704262-ecc82b23dc37", user: "silverkblack", page: "professor-lectures-to-students-in-a-classroom-setting-RDf6Cvns88Q", alt: "A lecture in a classroom" },
+  magdeburg:    { src: "photo-1580419968835-409eec5e6143", user: "sauer", page: "brown-concrete-building-near-body-of-water-during-daytime-4-yrDy-2PMQ", alt: "Magdeburg by the river" },
+  certs:        { src: "photo-1638636241638-aef5120c5153", user: "heyquilia", page: "a-framed-diploma-with-a-gold-seal-on-it-lJvU6RQno0g", alt: "A framed certificate with a gold seal" },
+  medal:        { src: "photo-1605732562742-3023a888e56e", user: "aronyigin", page: "stacked-orange-shipping-containers-sNY6B9NsPP8", alt: "Stacked shipping containers" },
+  blackoasis:   { src: "photo-1553775282-20af80779df7", user: "machec", page: "black-and-brown-headset-near-laptop-computer-BeVGrXEktIk", alt: "A headset beside a laptop" },
+  avertra:      { src: "photo-1686771416282-3888ddaf249b", user: "miinrad", page: "a-man-and-a-woman-shaking-hands-in-front-of-a-laptop-qFSQFSmfZkA", alt: "A handshake at an interview" },
+  ssip:         { src: "photo-1587330979470-3595ac045ab0", user: "florianwehde", page: "brandenburg-gate-at-night-in-berlin-uFGi0_YciE0", alt: "The Brandenburg Gate in Berlin at night" },
+  dvag:         { src: "photo-1772588627373-729b0f47e5bb", user: "kellysikkema", page: "person-reviewing-documents-with-calculator-and-laptop-tLqtcDZltPs", alt: "Reviewing financial documents with a calculator" },
+  aiesec:       { src: "photo-1542323228-002ac256e7b8", user: "camylla93", page: "people-with-hands-gathered-in-the-middle-ABVE1cyT7hk", alt: "A team with hands gathered in the middle" },
+  rosemount:    { src: "photo-1529180979161-06b8b6d6f2be", user: "mscheid", page: "family-in-silhouette-against-orange-sky-0iqkntLw93A", alt: "A family holding hands at sunset" },
+  gradguides:   { src: "photo-1761781342506-30f68c930a16", user: "ethan_gowans", page: "graduation-ceremony-with-students-in-blue-caps-and-gowns-NXnX56qv2c0", alt: "Students at a graduation ceremony" },
+  dealio:       { src: "photo-1753351057311-8fd3c46bc4e2", user: "silverkblack", page: "friends-are-sharing-pizza-and-conversation-at-a-restaurant-Isbx9diUnhU", alt: "Friends sharing pizza" },
+  energy:       { src: "photo-1607400201889-565b1ee75f8e", user: "introspectivedsgn", page: "person-installing-wiring-in-wall-insulation-aCshJn3y93s", alt: "Insulation being fitted in a wall" },
+  steeple:      { src: "photo-1760611656148-063d3b9a8dbc", user: "davidkristianto", page: "various-chairs-displayed-in-a-showroom-setting-rItWuQHaOpM", alt: "Chairs in a furniture showroom" },
+  "s-strategy": { src: "photo-1528819622765-d6bcf132f793", user: "felix_mittermeier", page: "chess-pieces-on-board-nAjil1z3eLk", alt: "Chess pieces on a board" },
+  "s-digital":  { src: "photo-1666875753105-c63a6f3bdc86", user: "dengxiangs", page: "graphical-user-interface--WXQm_NTK0U", alt: "An analytics dashboard" },
+  "s-sales":    { src: "photo-1758519288905-38b7b00c1023", user: "silverkblack", page: "two-businessmen-shaking-hands-across-a-table-lZXX-QVdyXY", alt: "A handshake across a table" },
+  "s-research": { src: "photo-1488190211105-8b0e65b80b4e", user: "thoughtcatalog", page: "person-holding-ballpoint-pen-writing-on-notebook-505eectW54k", alt: "Writing notes in a notebook" },
+  "s-tools":    { src: "photo-1766074903100-bc435aa4c60d", user: "wolfart32", page: "laptop-screen-showing-a-video-conference-and-spreadsheet-5FRDoTNMvfI", alt: "A spreadsheet on a laptop" },
+  "s-lang":     { src: "photo-1543165796-5426273eaab3", user: "waldemarbrandt67w", page: "open-dictionary-U3Ptj3jafX8", alt: "An open dictionary" }
+};
+
+/*
+  QUIZ for the archery challenge: one question per subtopic.
+  The FIRST answer is the correct one (the game shuffles them).
+*/
+window.SITE.quiz = {
+  story:        ["What does the family name Abu Al Neel mean?", "Father of the Nile", "Son of the Desert", "House of the River"],
+  drive:        ["Which of these is one of Wisam's core strengths?", "Persistence", "Perfectionism", "Risk-taking"],
+  next:         ["When is Wisam available to start?", "Immediately", "In six months", "Next year"],
+  interests:    ["Which sport does Wisam enjoy for its focus and patience?", "Archery", "Golf", "Fencing"],
+  tcd:          ["Which degree did Wisam earn at Trinity College Dublin?", "MSc Entrepreneurship & Innovation", "MBA", "MSc Finance"],
+  gju:          ["What did Wisam study at the German Jordanian University?", "German and English for Business and Communication", "Mechanical Engineering", "Law"],
+  magdeburg:    ["Where did Wisam spend the exchange year?", "Germany", "France", "Spain"],
+  certs:        ["Which academy certified Wisam in export marketing?", "ITC Academy (International Trade Centre)", "WTO Academy", "IMF Institute"],
+  medal:        ["What did Wisam assess at Medal Consulting?", "Whether products were ready to export", "Building safety", "Tax returns"],
+  blackoasis:   ["How did Wisam's sales results at Black Oasis compare?", "Above the team average", "Below the team average", "Exactly average"],
+  avertra:      ["Which roles did Wisam recruit for at Avertra?", "QA, SAP and Product Owner", "Chefs and waiters", "Pilots and cabin crew"],
+  ssip:         ["In which language did Wisam write articles at SSIP in Berlin?", "German", "French", "Spanish"],
+  dvag:         ["Who did Wisam help with financial planning at DVAG?", "International students and new residents", "Retirees", "Large corporations"],
+  aiesec:       ["What did Wisam flag to AIESEC's leadership?", "An out-of-date lead pool", "A budget overspend", "A broken website"],
+  rosemount:    ["What did Wisam build for Rosemount Family Resource Centre?", "A funding strategy", "A mobile app", "A new office layout"],
+  gradguides:   ["Grad Guides connects international students with…", "Verified alumni mentors", "Landlords", "Travel agents"],
+  dealio:       ["What does Dealio offer students?", "Verified food and shopping deals", "Free textbooks", "Part-time jobs"],
+  energy:       ["The Fair Energy Navigator helps households…", "Find and apply for retrofit grants", "Switch electricity supplier", "Sell solar power"],
+  steeple:      ["How did Wisam describe Steeple Group?", "Financially strong, commercially under-accelerated", "About to go bankrupt", "A fast-growing tech startup"],
+  "s-strategy": ["Which framework is in Wisam's strategy toolkit?", "Porter's Five Forces", "Six Sigma", "Kanban"],
+  "s-digital":  ["Which ad platforms has Wisam managed?", "Google Ads and Meta", "TikTok and Snapchat", "Amazon and eBay"],
+  "s-sales":    ["Which style of selling does Wisam practise?", "Consultative selling", "Auctioneering", "Door-to-door only"],
+  "s-research": ["In which two languages does Wisam write research and reports?", "English and German", "French and Spanish", "Italian and Dutch"],
+  "s-tools":    ["Which applicant tracking system has Wisam used?", "Zoho Recruit", "Greenhouse", "Lever"],
+  "s-lang":     ["How many languages does Wisam speak?", "Three", "Two", "Five"]
 };

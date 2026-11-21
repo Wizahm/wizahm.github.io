@@ -2,25 +2,19 @@
   "use strict";
   const S = window.SITE;
 
-  /* Google Form for "Ask me about". Paste the WEBSITE LINK printed by google-form-setup.gs
-     (it contains __TOPIC__, which the site replaces with what the visitor picked).
-     Empty = falls back to opening the visitor's email app. */
+  /* Google Form for "Ask me about". The site swaps __TOPIC__ for what the visitor picked. */
   const GOOGLE_FORM_PREFILL = "https://docs.google.com/forms/d/e/1FAIpQLSeASPTdMRIRpXEJcyyp_XzjNecPE2B9qqKHCBPC7UuufD0sHw/viewform?usp=pp_url&entry.743808413=__TOPIC__";
 
   /* ── Colour moods on the Midnight-to-Navy palette (#0a031d #070a25 #090c2a #071132 #0a183b).
-       All backgrounds are near-identical in brightness, so moving between sections is a gentle hue shift.
+       Each section has ONE colour that its subtopics share.
        accent = bright colour for text/outlines on dark · fill = deeper colour behind white text. ── */
   const THEMES = {
-    home:      { bg: "#070a25", ink: "#EEF1F8", accent: "#E0B84A", accent2: "#8DB4F0", fill: "#1F3B7A", tileA: "#C9A227", tileB: "#2C4B86", tileC: "#090c2a", line: "#3B4C7E", pattern: "star" },
-    gold:      { bg: "#0a031d", ink: "#F3EEDF", accent: "#E8C766", accent2: "#8DB4F0", fill: "#8A6A12", tileA: "#C9A227", tileB: "#3A3A7A", tileC: "#0d0828", line: "#4F4772", pattern: "star" },
-    lapis:     { bg: "#071132", ink: "#EAF0FB", accent: "#8DB4F0", accent2: "#E0B84A", fill: "#2A4F9E", tileA: "#3A63B8", tileB: "#C9A227", tileC: "#0a1538", line: "#3A5490", pattern: "hex" },
-    turquoise: { bg: "#070a25", ink: "#E8F6F6", accent: "#5FD0C8", accent2: "#E0B84A", fill: "#0E6B70", tileA: "#128A8F", tileB: "#E0B84A", tileC: "#0a1230", line: "#2F6A78", pattern: "diamond" },
-    sky:       { bg: "#071132", ink: "#EAF3FC", accent: "#7CC0F0", accent2: "#E0B84A", fill: "#1D6FB0", tileA: "#4A9BD6", tileB: "#E0B84A", tileC: "#0a1538", line: "#3A6A9A", pattern: "hex" },
-    amber:     { bg: "#0a031d", ink: "#F7EEDF", accent: "#F0B860", accent2: "#8DB4F0", fill: "#9A5B0C", tileA: "#E3A23B", tileB: "#2C4B86", tileC: "#0d0828", line: "#6A5236", pattern: "diamond" },
-    teal:      { bg: "#090c2a", ink: "#E6F6EF", accent: "#6FD3AE", accent2: "#E0B84A", fill: "#13684F", tileA: "#2E9A78", tileB: "#C9A227", tileC: "#0c1032", line: "#2F6A5C", pattern: "star" },
-    navy:      { bg: "#071132", ink: "#ECEFF7", accent: "#B9C6E8", accent2: "#D4AF37", fill: "#34508F", tileA: "#34508F", tileB: "#B08D2E", tileC: "#0a1538", line: "#44578A", pattern: "diamond" },
-    ivory:     { bg: "#090c2a", ink: "#F5F0E2", accent: "#F3E3B5", accent2: "#8DB4F0", fill: "#2C4B86", tileA: "#C9A227", tileB: "#2C4B86", tileC: "#0c1032", line: "#4A5684", pattern: "hex" },
-    cobalt:    { bg: "#070a25", ink: "#EDF0FC", accent: "#9FB3FF", accent2: "#E0A060", fill: "#2340B5", tileA: "#3557D0", tileB: "#C77D2E", tileC: "#0a0d2c", line: "#3E4E9A", pattern: "star" }
+    home:    { bg: "#070a25", ink: "#EEF1F8", accent: "#E0B84A", accent2: "#8DB4F0", fill: "#1F3B7A", tileA: "#C9A227", tileB: "#2C4B86", tileC: "#090c2a", line: "#3B4C7E", pattern: "star" },
+    gold:    { bg: "#0a031d", ink: "#F3EEDF", accent: "#E8C766", accent2: "#8DB4F0", fill: "#8A6A12", tileA: "#C9A227", tileB: "#3A3A7A", tileC: "#0d0828", line: "#4F4772", pattern: "star" },
+    emerald: { bg: "#090c2a", ink: "#E6F6EE", accent: "#6FD3A0", accent2: "#E0B84A", fill: "#1D7A4C", tileA: "#2E9A66", tileB: "#C9A227", tileC: "#0c1032", line: "#2F6A55", pattern: "hex" },
+    lapis:   { bg: "#071132", ink: "#EAF0FB", accent: "#8DB4F0", accent2: "#E0B84A", fill: "#2A4F9E", tileA: "#3A63B8", tileB: "#C9A227", tileC: "#0a1538", line: "#3A5490", pattern: "hex" },
+    coral:   { bg: "#0a031d", ink: "#F8ECE8", accent: "#F5A08A", accent2: "#8DB4F0", fill: "#A3472F", tileA: "#D86A4A", tileB: "#2C4B86", tileC: "#0d0828", line: "#6A4036", pattern: "diamond" },
+    violet:  { bg: "#070a25", ink: "#EFEAFB", accent: "#C3A6FF", accent2: "#E0B84A", fill: "#5B3FB0", tileA: "#7A5AD8", tileB: "#E0B84A", tileC: "#0a0d2c", line: "#4E4290", pattern: "star" }
   };
 
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -38,6 +32,16 @@
     try { if (window.umami && typeof window.umami.track === "function") window.umami.track(name, data); } catch (_) {}
   }
 
+  /* ── Per-visitor progress, kept in this browser only (fine if it's missing) ── */
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem("wa_" + k); return v ? JSON.parse(v) : d; } catch (_) { return d; } },
+    set(k, v) { try { localStorage.setItem("wa_" + k, JSON.stringify(v)); } catch (_) {} }
+  };
+  const visited = new Set(store.get("visited", []));
+  const golden = new Set(store.get("gold", []));
+  let played = store.get("played", false);
+  let bestScore = store.get("best", 0);
+
   /* ── Build graph model ── */
   const nodes = [];
   const byId = {};
@@ -46,14 +50,14 @@
 
   add({ id: "me", type: "center", label: S.person.name, theme: "home" });
   S.categories.forEach((c) => {
-    add({ id: c.id, type: "category", label: c.label, theme: c.theme, data: c });
+    add({ id: c.id, type: "category", label: c.label, theme: c.theme, shape: c.shape, data: c });
     edges.push({ a: "me", b: c.id, kind: "spoke" });
     c.items.forEach((it) => {
-      add({ id: it.id, type: "item", label: it.label, theme: it.theme || c.theme, cat: c.id, data: it });
+      add({ id: it.id, type: "item", label: it.label, theme: c.theme, shape: c.shape, cat: c.id, data: it });
       edges.push({ a: c.id, b: it.id, kind: "spoke" });
     });
   });
-  // Cross-links (deduplicated, both directions count as "related")
+  const items = nodes.filter((n) => n.type === "item");
   const related = {};
   const seen = new Set();
   nodes.forEach((n) => {
@@ -68,27 +72,43 @@
     });
   });
 
-  /* ── Radial layout: you → categories → items ── */
-  const R1 = 235, R2 = 470;
-  const cats = S.categories;
-  const weights = cats.map((c) => Math.max(c.items.length, 2.2));
-  const total = weights.reduce((a, b) => a + b, 0);
-  let ang = -Math.PI / 2 - (Math.PI * 2 * weights[0]) / total / 2;
+  /* ── Layout: every subtopic sits evenly on ONE circle; each section sits at the middle of its group ── */
+  const R1 = 265, R2 = 545;
+  const N = items.length;
+  const first = S.categories[0].items.length;
   byId.me.x = 0; byId.me.y = 0; byId.me.r = 78;
-  cats.forEach((c, ci) => {
-    const span = (Math.PI * 2 * weights[ci]) / total;
-    const mid = ang + span / 2;
-    const cn = byId[c.id];
-    cn.x = Math.cos(mid) * R1; cn.y = Math.sin(mid) * R1; cn.r = 54; cn.angle = mid;
-    const n = c.items.length;
-    c.items.forEach((it, i) => {
-      const a = ang + span * ((i + 0.5) / n);
-      const r = R2 + (n > 4 ? (i % 2 ? 70 : 0) : 0);
-      const node = byId[it.id];
-      node.x = Math.cos(a) * r; node.y = Math.sin(a) * r; node.r = 30; node.angle = a;
-    });
-    ang += span;
+  items.forEach((n, i) => {
+    const a = -Math.PI / 2 + (2 * Math.PI * (i - (first - 1) / 2)) / N;
+    n.angle = a; n.x = Math.cos(a) * R2; n.y = Math.sin(a) * R2; n.r = 31;
   });
+  S.categories.forEach((c) => {
+    const kids = c.items.map((it) => byId[it.id]);
+    const sx = kids.reduce((s, k) => s + Math.cos(k.angle), 0), sy = kids.reduce((s, k) => s + Math.sin(k.angle), 0);
+    const a = Math.atan2(sy, sx);
+    const cn = byId[c.id];
+    cn.angle = a; cn.x = Math.cos(a) * R1; cn.y = Math.sin(a) * R1; cn.r = 56;
+  });
+  const GAME_POS = { x: 0, y: R2 + 190 };
+
+  /* ── Shapes: each section has its own; its subtopics share it ── */
+  function poly(n, r, rot) {
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const a = rot + (i * 2 * Math.PI) / n;
+      pts.push((Math.cos(a) * r).toFixed(1) + "," + (Math.sin(a) * r).toFixed(1));
+    }
+    return pts.join(" ");
+  }
+  function makeShape(shape, r, attrs) {
+    switch (shape) {
+      case "hexagon": return svgEl("polygon", { points: poly(6, r * 1.06, 0), ...attrs });
+      case "diamond": return svgEl("polygon", { points: poly(4, r * 1.2, -Math.PI / 2), ...attrs });
+      case "square": return svgEl("rect", { x: -r * 0.9, y: -r * 0.9, width: r * 1.8, height: r * 1.8, rx: r * 0.28, ...attrs });
+      case "pentagon": return svgEl("polygon", { points: poly(5, r * 1.1, -Math.PI / 2), ...attrs });
+      case "octagon": return svgEl("polygon", { points: poly(8, r * 1.02, Math.PI / 8), ...attrs });
+      default: return svgEl("circle", { r, ...attrs });
+    }
+  }
 
   /* ── Render ── */
   const web = $("#web"), gEdges = $("#edges"), gNodes = $("#nodes");
@@ -104,24 +124,16 @@
     if (cur) lines.push(cur);
     return lines;
   }
-  function octagon(r) {
-    const pts = [];
-    for (let i = 0; i < 8; i++) {
-      const a = Math.PI / 8 + (i * Math.PI) / 4;
-      pts.push((Math.cos(a) * r).toFixed(1) + "," + (Math.sin(a) * r).toFixed(1));
-    }
-    return pts.join(" ");
-  }
 
   edges.forEach((e) => {
     const A = byId[e.a], B = byId[e.b];
     let el;
     if (e.kind === "cross") {
       const mx = (A.x + B.x) / 2, my = (A.y + B.y) / 2;
-      const cx = mx * 0.55, cy = my * 0.55; // bow toward centre
-      el = svgEl("path", { d: `M${A.x},${A.y} Q${cx},${cy} ${B.x},${B.y}`, class: "edge cross" });
+      el = svgEl("path", { d: `M${A.x},${A.y} Q${mx * 0.55},${my * 0.55} ${B.x},${B.y}`, class: "edge cross" });
     } else {
       el = svgEl("line", { x1: A.x, y1: A.y, x2: B.x, y2: B.y, class: "edge" });
+      if (B.type === "item") el.style.stroke = THEMES[B.theme].line;
     }
     e.el = el;
     gEdges.appendChild(el);
@@ -133,7 +145,8 @@
       tabindex: "0", role: "button", "data-id": n.id,
       "aria-label": n.type === "center" ? "About Wisam: whole web" : `Open ${n.label}`
     });
-    g.appendChild(svgEl("circle", { r: n.r + 12, class: "halo" }));
+    const th = THEMES[n.theme];
+    g.appendChild(makeShape(n.shape || "circle", n.r + 12, { class: "halo" }));
     if (n.type === "center") {
       g.appendChild(svgEl("circle", { r: n.r + 8, class: "ring" }));
       g.appendChild(svgEl("circle", { r: n.r, class: "core" }));
@@ -141,30 +154,39 @@
       const t2 = svgEl("text", { class: "n2", "text-anchor": "middle", y: 20 }); t2.textContent = "Abu Al Neel";
       g.append(t1, t2);
     } else if (n.type === "category") {
-      const th = THEMES[n.theme];
-      g.appendChild(svgEl("polygon", { points: octagon(n.r), class: "tile", fill: th.fill }));
-      g.appendChild(svgEl("polygon", { points: octagon(n.r - 9), fill: "none", stroke: th.accent2, "stroke-width": 1.5, opacity: .8 }));
+      g.appendChild(makeShape(n.shape, n.r, { class: "tile", fill: th.fill }));
+      g.appendChild(makeShape(n.shape, n.r - 9, { fill: "none", stroke: th.accent, "stroke-width": 1.5, opacity: .7 }));
       const lines = wrap(n.label, 11);
       lines.forEach((ln, i) => {
         const t = svgEl("text", { "text-anchor": "middle", y: 5 + (i - (lines.length - 1) / 2) * 16 });
         t.textContent = ln; g.appendChild(t);
       });
     } else {
-      const th = THEMES[n.theme];
-      g.appendChild(svgEl("circle", { r: n.r, class: "dot", stroke: th.accent }));
-      g.appendChild(svgEl("rect", { x: -8, y: -8, width: 16, height: 16, class: "gem", fill: th.tileA, transform: "rotate(45)" }));
-      // Label goes on the outer side of the node so it doesn't sit on the lines
+      // Arrows come in at an angle so they never cover the tile's label
+      n.stuck = svgEl("g", { class: "stuck", transform: `rotate(${(n.angle * 180) / Math.PI + 42})` });
+      g.appendChild(n.stuck);
+      g.appendChild(makeShape(n.shape, n.r, { class: "dot", stroke: th.accent }));
+      g.appendChild(makeShape(n.shape, 9, { class: "gem", fill: th.tileA }));
+      n.sparkles = svgEl("g", { class: "sparkles", "aria-hidden": "true" });
+      g.appendChild(n.sparkles);
       const below = Math.sin(n.angle) > -0.35;
       const lines = wrap(n.label, 15);
       lines.forEach((ln, i) => {
-        const y = below ? n.r + 18 + i * 16 : -n.r - 10 - (lines.length - 1 - i) * 16;
+        const y = below ? n.r + 20 + i * 16 : -n.r - 12 - (lines.length - 1 - i) * 16;
         const t = svgEl("text", { class: "lbl", "text-anchor": "middle", y });
         t.textContent = ln; g.appendChild(t);
       });
     }
-    g.addEventListener("click", () => go(routeFor(n), "web"));
+    g.addEventListener("click", (ev) => {
+      if (panMoved) return; // that was a drag, not a click
+      if (n.type === "item") shootAndOpen(n, ev);
+      else go(routeFor(n), "web");
+    });
     g.addEventListener("keydown", (ev) => {
-      if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(routeFor(n), "web"); }
+      if (ev.key === "Enter" || ev.key === " ") {
+        ev.preventDefault();
+        if (n.type === "item") shootAndOpen(n, null); else go(routeFor(n), "web");
+      }
     });
     g.addEventListener("pointerenter", () => hover(n.id, true));
     g.addEventListener("pointerleave", () => hover(n.id, false));
@@ -174,6 +196,205 @@
 
   function hover(id, on) {
     edges.forEach((e) => { if (e.a === id || e.b === id) e.el.classList.toggle("hot", on); });
+  }
+
+  /* ── Arrows that stay stuck in the tiles you've opened ── */
+  function drawStuckArrow(n, animate) {
+    n.stuck.textContent = "";
+    const tip = n.r * 0.3, tail = n.r + 50;
+    const inner = svgEl("g", { class: "arrow-in" + (animate && !reduceMotion ? " hit" : "") });
+    inner.style.transformOrigin = `${tip}px 0px`;
+    inner.innerHTML = `
+      <path d="M${tail - 12},-1.2 L${tail + 2},-7 L${tail + 6},-7 L${tail - 2},-1.2 Z M${tail - 12},1.2 L${tail + 2},7 L${tail + 6},7 L${tail - 2},1.2 Z" fill="#FFFFFF" stroke="#4A4F57" stroke-width=".8"/>
+      <line x1="${tip}" y1="0" x2="${tail + 4}" y2="0" stroke="#5E0B0B" stroke-width="4.2" stroke-linecap="round"/>
+      <line x1="${tip}" y1="0" x2="${tail + 4}" y2="0" stroke="#D32F2F" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M${tail + 4},-2.6 H${tail + 9} V-.9 Q${tail + 6.6},-.9 ${tail + 6.6},0 Q${tail + 6.6},.9 ${tail + 9},.9 V2.6 H${tail + 4} Z" fill="#23272D"/>`;
+    n.stuck.appendChild(inner);
+  }
+  function clearStuckArrows() { items.forEach((n) => { n.stuck.textContent = ""; }); }
+
+  function drawGold(n) {
+    n.el.classList.toggle("gold", golden.has(n.id));
+    n.sparkles.textContent = "";
+    if (!golden.has(n.id)) return;
+    [[-n.r - 6, -n.r - 2, 1], [n.r + 4, -n.r + 6, 0.7], [n.r - 2, n.r + 2, 0.85]].forEach(([x, y, s], i) => {
+      const star = svgEl("path", {
+        d: "M0,-9 C1,-2 2,-1 9,0 C2,1 1,2 0,9 C-1,2 -2,1 -9,0 C-2,-1 -1,-2 0,-9 Z",
+        class: "spark", transform: `translate(${x},${y}) scale(${s})`
+      });
+      star.style.animationDelay = i * 0.6 + "s";
+      n.sparkles.appendChild(star);
+    });
+  }
+  function refreshMarks() {
+    items.forEach((n) => {
+      if (!played && visited.has(n.id)) { if (!n.stuck.firstChild) drawStuckArrow(n, false); }
+      else n.stuck.textContent = "";
+      drawGold(n);
+    });
+    updateProgress();
+    updateGameButton();
+  }
+
+  /* The cursor becomes an arrow that flies into the tile, then the tile opens */
+  function shootAndOpen(n, ev) {
+    const isNew = !visited.has(n.id);
+    visited.add(n.id);
+    store.set("visited", [...visited]);
+    const open = () => go(routeFor(n), "web");
+    if (played || !isNew) { open(); updateProgress(); return; }
+    track("tile_explored", { id: n.id, count: visited.size });
+    const done = () => {
+      drawStuckArrow(n, true);
+      updateProgress();
+      if (visited.size === N) setTimeout(unlockChallenge, 900);
+    };
+    if (!ev || reduceMotion || typeof ev.clientX !== "number") { done(); open(); return; }
+    const pt = web.createSVGPoint(); pt.x = n.x; pt.y = n.y;
+    const sp = pt.matrixTransform(web.getScreenCTM());
+    const dx = sp.x - ev.clientX, dy = sp.y - ev.clientY;
+    const ang = (Math.atan2(dy, dx) * 180) / Math.PI + 135; // the cursor art points up-left
+    const fly = document.createElement("img");
+    fly.src = "cursor-arrow.svg"; fly.alt = ""; fly.className = "flying-arrow";
+    document.body.appendChild(fly);
+    document.body.classList.add("shooting");
+    const anim = fly.animate([
+      { transform: `translate(${ev.clientX - 2}px,${ev.clientY - 2}px) rotate(${ang}deg) scale(1.1)` },
+      { transform: `translate(${ev.clientX - 2 + dx * 0.15}px,${ev.clientY - 2 + dy * 0.15 - 10}px) rotate(${ang}deg) scale(1.5)`, offset: 0.3 },
+      { transform: `translate(${sp.x - 2}px,${sp.y - 2}px) rotate(${ang}deg) scale(1)` }
+    ], { duration: 420, easing: "cubic-bezier(.5,0,.75,1)" });
+    const finish = () => { fly.remove(); document.body.classList.remove("shooting"); done(); open(); };
+    anim.onfinish = finish;
+    setTimeout(() => { if (fly.isConnected) finish(); }, 700);
+  }
+
+  /* ── Progress pill ── */
+  const pill = document.createElement("button");
+  pill.type = "button"; pill.id = "progress"; pill.className = "chip progress";
+  document.querySelector(".topbar").insertBefore(pill, document.querySelector(".actions"));
+  pill.addEventListener("click", () => go("#/", "pill"));
+  function updateProgress() {
+    const v = visited.size;
+    if (played) pill.innerHTML = `🏹 Best score <b>${bestScore.toLocaleString()}</b>`;
+    else if (v >= N) pill.innerHTML = `🎯 <b>${N}/${N}</b> · Challenge unlocked`;
+    else pill.innerHTML = `🎯 <b>${v}/${N}</b> <span class="long">explored</span>`;
+    pill.title = played ? "Your best archery score" : "Open every tile to unlock a challenge";
+  }
+
+  /* ── Challenge button below the web (appears once every tile is open) ── */
+  const gameBtn = svgEl("g", { id: "gameBtn", class: "game-btn", transform: `translate(${GAME_POS.x},${GAME_POS.y})`, tabindex: "0", role: "button", "aria-label": "Take the archery challenge" });
+  gameBtn.innerHTML = `
+    <circle class="ripple" r="62"/><circle class="ripple r2" r="62"/><circle class="ripple r3" r="62"/>
+    <g class="core-g">
+      <circle class="core" r="60"/>
+      <circle r="38" fill="#FFFFFF"/><circle r="29" fill="#1B2440"/><circle r="20" fill="#3A63B8"/><circle r="11" fill="#D32F2F"/><circle r="4" fill="#F5D06A"/>
+    </g>
+    <text class="gb-l1" y="90" text-anchor="middle">Take the challenge</text>
+    <text class="gb-l2" y="110" text-anchor="middle">25 questions · 1 bow</text>`;
+  gameBtn.style.display = "none";
+  $("#nodes").appendChild(gameBtn);
+  const lightsLayer = svgEl("g", { id: "lights" });
+  $("#nodes").appendChild(lightsLayer);
+  gameBtn.addEventListener("click", () => { if (!panMoved) launchChallenge(); });
+  gameBtn.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); launchChallenge(); } });
+  function updateGameButton() {
+    const on = visited.size >= N || played;
+    gameBtn.style.display = on ? "" : "none";
+    gameBtn.querySelector(".gb-l1").textContent = played ? "Play again" : "Take the challenge";
+  }
+
+  function unlockChallenge() {
+    updateGameButton();
+    toast("Every tile explored! A challenge has appeared below the web.");
+    track("challenge_unlocked", {});
+    if (!current || current.type === "home") flyTo(cameraFor({ type: "home", id: "me" }));
+  }
+
+  /* All the stuck arrows turn into lights, swirl into the button, then the game starts */
+  let launching = false;
+  function launchChallenge() {
+    if (launching || !window.ArcheryGame) return;
+    launching = true;
+    track("challenge_start", { replay: played });
+    if (location.hash && location.hash !== "#/") go("#/", "challenge");
+    else flyTo(cameraFor({ type: "home", id: "me" }));
+    setTimeout(swirl, reduceMotion ? 0 : 1150);
+  }
+  function swirl() {
+    const sources = items.filter((n) => visited.has(n.id));
+    clearStuckArrows();
+    const lights = sources.map((n, i) => {
+      const c = svgEl("circle", { r: 7, class: "light" });
+      lightsLayer.appendChild(c);
+      const dx = n.x - GAME_POS.x, dy = n.y - GAME_POS.y;
+      return { el: c, r0: Math.hypot(dx, dy), a0: Math.atan2(dy, dx), delay: (i % 6) * 0.03 };
+    });
+    const dur = reduceMotion ? 10 : 2100, t0 = performance.now();
+    const ease = (t) => t * t * (3 - 2 * t);
+    let ended = false;
+    const end = () => {
+      if (ended) return; ended = true;
+      lightsLayer.textContent = "";
+      gameBtn.classList.add("charged");
+      fadeTo(true, () => {
+        gameBtn.classList.remove("charged");
+        window.ArcheryGame.start({ questions: buildQuestions(), onEnd: gameEnded, onExit: backToWeb, track });
+        fadeTo(false);
+      });
+    };
+    const step = (now) => {
+      const t = Math.min(1, (now - t0) / dur);
+      lights.forEach((L) => {
+        const k = ease(Math.max(0, Math.min(1, (t - L.delay) / (1 - L.delay))));
+        const r = L.r0 * (1 - k), a = L.a0 + 2.6 * Math.PI * k;
+        L.el.setAttribute("cx", GAME_POS.x + Math.cos(a) * r);
+        L.el.setAttribute("cy", GAME_POS.y + Math.sin(a) * r);
+        L.el.setAttribute("r", 7 * (1 - 0.6 * k) + 1);
+      });
+      if (t < 1) requestAnimationFrame(step); else end();
+    };
+    requestAnimationFrame(step);
+    setTimeout(end, dur + 600);
+  }
+
+  const fader = document.createElement("div");
+  fader.id = "fader"; document.body.appendChild(fader);
+  function fadeTo(on, cb) {
+    fader.classList.toggle("on", on);
+    setTimeout(() => cb && cb(), reduceMotion ? 50 : 900);
+  }
+
+  function buildQuestions() {
+    return items.filter((n) => S.quiz && S.quiz[n.id]).map((n) => {
+      const [q, right, ...wrong] = S.quiz[n.id];
+      return { id: n.id, label: n.label, section: byId[n.cat].label, color: THEMES[n.theme].accent, q, right, answers: [right, ...wrong] };
+    });
+  }
+  function gameEnded(result) {
+    played = true;
+    store.set("played", true);
+    result.correctIds.forEach((id) => golden.add(id));
+    store.set("gold", [...golden]);
+    if (result.score > bestScore) { bestScore = result.score; store.set("best", bestScore); }
+  }
+  function backToWeb(result) {
+    fadeTo(true, () => {
+      window.ArcheryGame.hide();
+      launching = false;
+      refreshMarks();
+      fadeTo(false);
+      if (result && result.correct > 0) setTimeout(() => toast(`Your ${result.correct} correct answer${result.correct === 1 ? "" : "s"} now shine gold ✨`), 700);
+    });
+  }
+
+  /* ── Toast ── */
+  const toastEl = document.createElement("div");
+  toastEl.id = "toast"; toastEl.setAttribute("role", "status");
+  document.body.appendChild(toastEl);
+  let toastT = 0;
+  function toast(msg) {
+    toastEl.textContent = msg; toastEl.classList.add("on");
+    clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove("on"), 4200);
   }
 
   /* ── Camera: animate the SVG viewBox ── */
@@ -199,8 +420,8 @@
   function boxFor(ids, pad) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     ids.forEach((id) => {
-      const n = byId[id];
-      const extra = n.type === "item" ? 40 : 0; // room for labels
+      const n = id === "game" ? { x: GAME_POS.x, y: GAME_POS.y, r: 70, type: "item" } : byId[id];
+      const extra = n.type === "item" ? 44 : 0;
       x0 = Math.min(x0, n.x - n.r - 60); x1 = Math.max(x1, n.x + n.r + 60);
       y0 = Math.min(y0, n.y - n.r - extra); y1 = Math.max(y1, n.y + n.r + extra + 10);
     });
@@ -212,14 +433,14 @@
     let s = Math.min(R.w / box.w, R.h / box.h);
     if (maxScale) s = Math.min(s, maxScale);
     const cx = box.x + box.w / 2, cy = box.y + box.h / 2;
-    const w = R.W / s, h = R.H / s;
-    return { x: cx - (R.x + R.w / 2) / s, y: cy - (R.y + R.h / 2) / s, w, h };
+    return { x: cx - (R.x + R.w / 2) / s, y: cy - (R.y + R.h / 2) / s, w: R.W / s, h: R.H / s };
   }
 
   function setCam(c) { cam = c; web.setAttribute("viewBox", `${c.x} ${c.y} ${c.w} ${c.h}`); }
 
+  function stopFlight() { cancelAnimationFrame(camAnim); clearTimeout(flyTo.t); }
   function flyTo(target) {
-    cancelAnimationFrame(camAnim);
+    stopFlight();
     if (!cam || reduceMotion) return setCam(target);
     const from = { ...cam };
     const dur = 1100, t0 = performance.now();
@@ -233,10 +454,82 @@
       if (t < 1) camAnim = requestAnimationFrame(step);
     };
     camAnim = requestAnimationFrame(step);
-    // Safety net: if frames are throttled (background tab), still land on target.
-    clearTimeout(flyTo.t);
     flyTo.t = setTimeout(() => { if (cam.w !== target.w) { cancelAnimationFrame(camAnim); setCam(target); } }, dur + 150);
   }
+
+  /* ── Zoom and pan: mouse wheel, drag, pinch, and the +/− buttons ── */
+  let panMoved = false;
+  const ptrs = new Map();
+  let gesture = null;
+  const MIN_W = 220, MAX_W = 7000;
+  function zoomAt(factor, sx, sy) {
+    if (!cam) return;
+    stopFlight();
+    const W = web.clientWidth, H = web.clientHeight;
+    const wx = cam.x + (sx / W) * cam.w, wy = cam.y + (sy / H) * cam.h;
+    const nw = Math.max(MIN_W, Math.min(MAX_W, cam.w / factor));
+    const nh = cam.h * (nw / cam.w);
+    setCam({ x: wx - (sx / W) * nw, y: wy - (sy / H) * nh, w: nw, h: nh });
+  }
+  const local = (e) => { const r = web.getBoundingClientRect(); return { x: e.clientX - r.left, y: e.clientY - r.top }; };
+  web.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    const p = local(e);
+    zoomAt(Math.exp(-e.deltaY * (e.ctrlKey ? 0.01 : 0.0018)), p.x, p.y);
+  }, { passive: false });
+  web.addEventListener("pointerdown", (e) => {
+    if (e.button !== 0 && e.pointerType === "mouse") return;
+    ptrs.set(e.pointerId, local(e));
+    panMoved = false;
+    if (ptrs.size === 1) gesture = { kind: "pan", start: local(e), cam: { ...cam } };
+    if (ptrs.size === 2) {
+      const [a, b] = [...ptrs.values()];
+      gesture = { kind: "pinch", d: Math.hypot(a.x - b.x, a.y - b.y), mid: { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }, cam: { ...cam } };
+    }
+  });
+  window.addEventListener("pointermove", (e) => {
+    if (!ptrs.has(e.pointerId) || !gesture) return;
+    ptrs.set(e.pointerId, local(e));
+    const W = web.clientWidth, H = web.clientHeight;
+    if (gesture.kind === "pan" && ptrs.size === 1) {
+      const p = local(e);
+      const dx = p.x - gesture.start.x, dy = p.y - gesture.start.y;
+      if (!panMoved && Math.hypot(dx, dy) < 7) return;
+      panMoved = true; stopFlight(); web.classList.add("grabbing");
+      setCam({ ...gesture.cam, x: gesture.cam.x - (dx / W) * gesture.cam.w, y: gesture.cam.y - (dy / H) * gesture.cam.h });
+    } else if (gesture.kind === "pinch" && ptrs.size === 2) {
+      const [a, b] = [...ptrs.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      panMoved = true; stopFlight();
+      const c0 = gesture.cam;
+      const nw = Math.max(MIN_W, Math.min(MAX_W, (c0.w * gesture.d) / Math.max(d, 1)));
+      const nh = c0.h * (nw / c0.w);
+      const wx = c0.x + (gesture.mid.x / W) * c0.w, wy = c0.y + (gesture.mid.y / H) * c0.h;
+      const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+      setCam({ x: wx - (mid.x / W) * nw, y: wy - (mid.y / H) * nh, w: nw, h: nh });
+    }
+  });
+  const endPtr = (e) => {
+    if (!ptrs.has(e.pointerId)) return;
+    ptrs.delete(e.pointerId);
+    web.classList.remove("grabbing");
+    if (ptrs.size === 1) { const p = [...ptrs.values()][0]; gesture = { kind: "pan", start: p, cam: { ...cam } }; }
+    else if (ptrs.size === 0) { gesture = null; setTimeout(() => { panMoved = false; }, 0); }
+  };
+  window.addEventListener("pointerup", endPtr);
+  window.addEventListener("pointercancel", endPtr);
+
+  const zoomBox = document.createElement("div");
+  zoomBox.className = "zoom-ctl";
+  zoomBox.innerHTML = `<button type="button" data-z="in" aria-label="Zoom in">+</button><button type="button" data-z="out" aria-label="Zoom out">−</button><button type="button" data-z="fit" aria-label="Show the whole web">⤢</button>`;
+  document.body.appendChild(zoomBox);
+  zoomBox.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    const R = screenRect();
+    if (b.dataset.z === "fit") go("#/", "zoom");
+    else zoomAt(b.dataset.z === "in" ? 1.35 : 1 / 1.35, R.x + R.w / 2, R.y + R.h / 2);
+    track("zoom", { how: b.dataset.z });
+  });
 
   /* ── Theme ── */
   function applyTheme(name) {
@@ -269,7 +562,6 @@
     const via = pendingVia || (current ? "back" : "link");
     pendingVia = null;
 
-    // Reading-time signal for the node we are leaving
     if (current && current.type !== "home") {
       const secs = Math.round((performance.now() - openedAt) / 1000);
       if (secs >= 5) track("node_read", { id: current.id, seconds: secs >= 60 ? "60+" : secs >= 20 ? "20-59" : "5-19" });
@@ -277,13 +569,19 @@
     if (state.type !== "home") {
       const n = byId[state.id];
       track("node_open", { id: n.id, label: n.label, type: n.type, category: n.cat || n.id, via });
+      // Opening a subtopic any other way (list, related chip, deep link) still counts as explored
+      if (n.type === "item" && !visited.has(n.id)) {
+        visited.add(n.id); store.set("visited", [...visited]);
+        if (!played) drawStuckArrow(n, true);
+        updateProgress();
+        if (visited.size === N) setTimeout(unlockChallenge, 900);
+      }
     }
     current = state; openedAt = performance.now();
 
     const n = byId[state.id];
     applyTheme(state.type === "home" ? "home" : n.theme);
 
-    // Focus / dim
     let focus = null;
     if (state.type === "category") focus = new Set(["me", n.id, ...n.data.items.map((i) => i.id)]);
     if (state.type === "item") focus = new Set([n.id, n.cat, ...(related[n.id] || [])]);
@@ -295,8 +593,8 @@
       const on = !focus || (focus.has(e.a) && focus.has(e.b) && (e.a === state.id || e.b === state.id || state.type === "category"));
       e.el.classList.toggle("dim", !on);
     });
+    gameBtn.classList.toggle("dim", !!focus);
 
-    // Panels
     const intro = $("#intro"), panel = $("#panel");
     if (state.type === "home") {
       panel.hidden = true;
@@ -312,6 +610,7 @@
         requestAnimationFrame(() => requestAnimationFrame(() => panel.classList.remove("entering")));
       }
     }
+    document.body.classList.toggle("panel-open", state.type !== "home");
 
     if (!listMode) flyTo(cameraFor(state));
     if (listMode && state.type !== "home") panel.focus({ preventScroll: true });
@@ -319,17 +618,31 @@
 
   function cameraFor(state) {
     const n = byId[state.id];
-    if (state.type === "home") return camFor(boxFor(nodes.map((m) => m.id), 30));
+    if (state.type === "home") {
+      const ids = nodes.map((m) => m.id);
+      if (gameBtn.style.display !== "none") ids.push("game");
+      return camFor(boxFor(ids, 30));
+    }
     if (state.type === "category") return camFor(boxFor(["me", n.id, ...n.data.items.map((i) => i.id)], 30), 1.25);
-    // Centre on the item itself; show its neighbourhood but never drift off it.
     const near = [n.cat, ...(related[n.id] || [])].map((id) => Math.hypot(byId[id].x - n.x, byId[id].y - n.y));
     const half = Math.max(230, Math.min(360, Math.min(...near) + 70));
     return camFor({ x: n.x - half, y: n.y - half * 0.75, w: half * 2, h: half * 1.5 }, 1.6);
   }
 
+  function photoFor(id) {
+    const p = S.photos && S.photos[id];
+    if (!p) return "";
+    const ref = "?utm_source=wizahm_portfolio&utm_medium=referral";
+    return `<figure class="photo">
+        <img src="https://images.unsplash.com/${esc(p.src)}?auto=format&fit=crop&w=840&h=420&q=70" alt="${esc(p.alt || "")}" loading="lazy" width="840" height="420">
+        <figcaption>Photo: <a href="https://unsplash.com/@${esc(p.user)}${ref}" target="_blank" rel="noopener">@${esc(p.user)}</a> on <a href="https://unsplash.com/photos/${esc(p.page)}${ref}" target="_blank" rel="noopener">Unsplash</a></figcaption>
+      </figure>`;
+  }
+
   function fillPanel(state, n) {
     const back = $("#panelBack");
     const body = $("#panelBody");
+    const th = THEMES[n.theme];
     if (state.type === "category") {
       back.textContent = "← Whole web";
       back.onclick = () => go("#/", "panel");
@@ -340,7 +653,7 @@
         <p>${esc(c.summary || "")}</p>
         <ul class="item-list">${c.items.map((it) => `
           <li><button type="button" data-go="${esc(c.id)}/${esc(it.id)}">
-            <strong>${esc(it.label)}</strong><span>${esc(it.meta || it.title || "")}</span>
+            <strong>${visited.has(it.id) ? "🏹 " : ""}${golden.has(it.id) ? "✨ " : ""}${esc(it.label)}</strong><span>${esc(it.meta || it.title || "")}</span>
           </button></li>`).join("")}
         </ul>`;
     } else {
@@ -349,16 +662,18 @@
       back.onclick = () => go("#/" + cat.id, "panel");
       const rel = [...(related[n.id] || [])].map((id) => byId[id]);
       body.innerHTML = `
-        <p class="kicker">${esc(cat.label)}</p>
+        ${photoFor(n.id)}
+        <p class="kicker">${esc(cat.label)}${golden.has(n.id) ? ' <span class="gold-badge">✨ Answered correctly</span>' : ""}</p>
         <h2>${esc(it.title || it.label)}</h2>
         ${it.meta ? `<p class="meta">${esc(it.meta)}</p>` : ""}
         ${(it.body || []).map((p) => `<p>${esc(p)}</p>`).join("")}
         ${it.bullets ? `<ul>${it.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}
         ${it.tags ? `<div class="tags">${it.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
         ${rel.length ? `<p class="section-label">Connected to</p><div class="related">${rel.map((r) =>
-          `<button class="chip" type="button" data-go="${esc(r.cat)}/${esc(r.id)}">${esc(r.label)}</button>`).join("")}</div>` : ""}
+          `<button class="chip" type="button" data-go="${esc(r.cat)}/${esc(r.id)}" style="--chip:${THEMES[r.theme].accent}">${esc(r.label)}</button>`).join("")}</div>` : ""}
         <button class="chip chip-solid ask-this" type="button" data-ask="${esc(it.label)}">Ask me more about ${esc(it.label)}</button>`;
     }
+    body.style.setProperty("--sec", th.accent);
     body.querySelectorAll("[data-go]").forEach((b) =>
       b.addEventListener("click", () => go("#/" + b.dataset.go, state.type === "category" ? "panel" : "related")));
     body.querySelectorAll("[data-ask]").forEach((b) => b.addEventListener("click", () => openAsk(b.dataset.ask, "panel")));
@@ -366,18 +681,19 @@
 
   $("#panelClose").addEventListener("click", () => go("#/", "panel"));
   document.addEventListener("keydown", (e) => {
+    if (window.ArcheryGame && window.ArcheryGame.isOpen()) return;
     if (e.key === "Escape" && !$("#ask").open && current && current.type !== "home") {
       go(current.type === "item" ? "#/" + byId[current.id].cat : "#/", "key");
     }
   });
 
-  /* ── List view (accessible, phone-friendly alternative to the web) ── */
+  /* ── List view ── */
   let listMode = false;
   const list = $("#list");
   list.innerHTML = `<div class="list-inner">
       <p class="kicker">Portfolio</p><h1>${esc(S.person.name)}</h1><p>${esc(S.person.intro)}</p>
       ${S.categories.map((c) => `
-        <section><h2>${esc(c.label)}</h2><p class="muted">${esc(c.summary || "")}</p>
+        <section style="--sec:${THEMES[c.theme].accent}"><h2>${esc(c.label)}</h2><p class="muted">${esc(c.summary || "")}</p>
         <ul class="item-list">${c.items.map((it) => `
           <li><button type="button" data-go="${esc(c.id)}/${esc(it.id)}">
             <strong>${esc(it.title || it.label)}</strong><span>${esc(it.meta || "")}</span></button></li>`).join("")}
@@ -392,6 +708,7 @@
     list.hidden = !listMode;
     web.style.visibility = listMode ? "hidden" : "visible";
     $("#intro").style.display = listMode ? "none" : "";
+    document.body.classList.toggle("list-mode", listMode);
     track("view_toggle", { view: listMode ? "list" : "web" });
     if (!listMode && current) setCam(cameraFor(current));
   });
@@ -459,19 +776,17 @@
 
   /* ── "Ask me about" ── */
   const ask = $("#ask"), askForm = $("#askForm"), topicsBox = $("#askTopics");
-  let askFrom = "header";
   function buildTopics(extra) {
     const list = [...S.askTopics];
     if (extra && !list.includes(extra)) list.unshift(extra);
     topicsBox.querySelectorAll("label").forEach((l) => l.remove());
-    list.forEach((t, i) => {
+    list.forEach((t) => {
       const l = document.createElement("label");
-      l.innerHTML = `<input type="radio" name="topic" value="${esc(t)}" ${extra ? (t === extra ? "checked" : "") : ""}><span>${esc(t)}</span>`;
+      l.innerHTML = `<input type="radio" name="topic" value="${esc(t)}" ${extra && t === extra ? "checked" : ""}><span>${esc(t)}</span>`;
       topicsBox.appendChild(l);
     });
   }
-  function openAsk(topic, from) {
-    askFrom = from || "header";
+  function openAsk(topic) {
     buildTopics(topic);
     $("#askStatus").textContent = "";
     askForm.reset();
@@ -479,69 +794,50 @@
     track("ask_open", { from: current ? current.id : "me", topic: topic || "none" });
     ask.showModal();
   }
-  $("#askOpen").addEventListener("click", () => openAsk(null, "header"));
+  $("#askOpen").addEventListener("click", () => openAsk(null));
 
   askForm.addEventListener("submit", async (e) => {
-    if (e.submitter && e.submitter.value === "cancel") return; // close button
+    if (e.submitter && e.submitter.value === "cancel") return;
     e.preventDefault();
     const fd = new FormData(askForm);
     const topic = fd.get("topic") || "";
     const message = (fd.get("message") || "").trim();
     if (!topic && !message) { $("#askStatus").textContent = "Pick a topic or write a question first."; return; }
-    // Only the chosen preset topic goes to analytics, never free text or emails.
     track("ask_submit", { topic: topic || "custom", from: current ? current.id : "me" });
-    if (GOOGLE_FORM_PREFILL) {
-      const text = (topic ? "I'd like to know more about: " + topic : "") + (topic && message ? "\n\n" : "") + message;
-      window.open(GOOGLE_FORM_PREFILL.replace("__TOPIC__", encodeURIComponent(text)), "_blank", "noopener");
-      $("#askStatus").textContent = "The form opened in a new tab. Thank you!";
-      setTimeout(() => ask.close(), 1800);
-    } else {
-      const subject = encodeURIComponent("Portfolio question: " + (topic || "custom"));
-      const bodyTxt = encodeURIComponent((topic ? "Topic: " + topic + "\n\n" : "") + message);
-      location.href = `mailto:${email}?subject=${subject}&body=${bodyTxt}`;
-      $("#askStatus").textContent = "Opening your email app…";
-    }
+    const text = (topic ? "I'd like to know more about: " + topic : "") + (topic && message ? "\n\n" : "") + message;
+    window.open(GOOGLE_FORM_PREFILL.replace("__TOPIC__", encodeURIComponent(text)), "_blank", "noopener");
+    $("#askStatus").textContent = "The form opened in a new tab. Thank you!";
+    setTimeout(() => ask.close(), 1800);
   });
 
-  /* ── Landing intro: Wisam in the centre, a short intro, then the web grows around him ── */
-  const HOLD_MS = 11000; // auto-continue after this long (the gold bar under the button shows it)
+  /* ── Landing intro: stays until the visitor clicks or taps ── */
   const splash = $("#splash");
-  let revealed = true, splashTimer = 0, splashStart = 0;
+  let revealed = true, splashStart = 0;
 
   function showSplash() {
     const sp = S.person.splash;
     $("#splashHello").textContent = sp.hello;
     $("#splashLead").textContent = sp.lead;
     $("#splashLines").innerHTML = sp.lines.map((l) => `<p>${esc(l)}</p>`).join("");
-    splash.style.setProperty("--hold", HOLD_MS / 1000 + "s");
+    const touch = matchMedia("(hover: none)").matches;
+    $("#splashSkip").textContent = touch ? "Tap anywhere to explore" : "Click anywhere to explore";
     splash.hidden = false;
     document.body.classList.add("pre");
     revealed = false;
     splashStart = performance.now();
-    splashTimer = setTimeout(() => reveal("auto"), HOLD_MS);
     splash.addEventListener("click", () => reveal("click"));
-    document.addEventListener("keydown", onSplashKey);
-    window.addEventListener("wheel", onSplashScroll, { passive: true });
     $("#splashGo").focus({ preventScroll: true });
   }
-  function onSplashKey(e) { if (!revealed && e.key !== "Tab") reveal("key"); }
-  function onSplashScroll() { if (!revealed) reveal("scroll"); }
 
   function reveal(how) {
     if (revealed) return;
     revealed = true;
-    clearTimeout(splashTimer);
-    document.removeEventListener("keydown", onSplashKey);
-    window.removeEventListener("wheel", onSplashScroll);
     track("intro_end", { how, seconds: Math.round((performance.now() - splashStart) / 1000) });
     try { sessionStorage.setItem("introSeen", "1"); } catch (_) {}
-
-    // Start the camera exactly where the intro circle is, so "Wisam" stays put while the web appears.
     const r = $("#splashMe").getBoundingClientRect();
-    const s = r.width / 2 / byId.me.r; // screen px per world unit
+    const s = r.width / 2 / byId.me.r;
     const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
     setCam({ x: -cx / s, y: -cy / s, w: web.clientWidth / s, h: web.clientHeight / s });
-
     document.body.classList.add("revealing");
     document.body.classList.remove("pre");
     splash.classList.add("out");
@@ -551,15 +847,18 @@
 
   /* ── Boot ── */
   applyTheme("home");
+  refreshMarks();
   setCam(camFor(boxFor(nodes.map((m) => m.id), 30)));
   window.addEventListener("hashchange", render);
   let rz;
-  window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { cancelAnimationFrame(camAnim); if (current && revealed) setCam(cameraFor(current)); }, 150); });
+  window.addEventListener("resize", () => { clearTimeout(rz); rz = setTimeout(() => { stopFlight(); if (current && revealed) setCam(cameraFor(current)); }, 150); });
 
-  // Show the intro on a normal first visit; skip it for deep links (e.g. from a LinkedIn post) or a repeat visit this session.
   let introSeen = false;
   try { introSeen = sessionStorage.getItem("introSeen") === "1"; } catch (_) {}
   const deepLink = location.hash.replace(/^#\/?/, "").length > 0;
   render();
   if (!deepLink && !introSeen) showSplash();
+
+  // Small hook so the browser console (and tests) can reset a visitor's progress
+  window.Portfolio = { reset() { ["visited", "gold", "played", "best"].forEach((k) => store.set(k, k === "played" ? false : k === "best" ? 0 : [])); location.reload(); } };
 })();
