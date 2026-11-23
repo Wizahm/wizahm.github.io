@@ -12,14 +12,15 @@ window.SITE = {
     initials: "WA",
     tagline: "Recent graduate, MSc Entrepreneurship & Innovation, Trinity College Dublin",
     intro:
-      "Strategy, consulting and business development. I've worked and studied in Jordan, Germany and Ireland, and I speak Arabic, English and German.",
+      "Sales, business development and consulting. I've worked and studied in Jordan, Germany and Ireland, and I speak Arabic, English and German.",
     location: "Dublin · Available immediately · Stamp 1G",
     // Landing intro shown before the web fades in
     splash: {
       hello: "Hi, I'm Wisam.",
       lead: "Recent Trinity College Dublin graduate · MSc Entrepreneurship & Innovation (2,1)",
       lines: [
-        "I turn research and people's needs into clear, practical strategy.",
+        "I open conversations, understand what people need and turn it into a clear, practical plan.",
+        "In outbound sales in Amman, I averaged 400 outbound calls a day with a 28% conversion rate on cold outreach.",
         "In Jordan, I assessed whether five companies' products were ready for export and designed the scoring framework my firm adopted. In Dublin, I built a funding strategy for a family resource centre and designed ventures for international students and energy-poor households."
       ]
     },
@@ -81,10 +82,10 @@ window.SITE = {
           title: "Ready to start",
           meta: "Dublin · Available immediately · Stamp 1G",
           body: [
-            "I'm a recent graduate of Trinity College Dublin's MSc in Entrepreneurship & Innovation. I'm looking for roles in strategy and consulting, business development and sales, or in Ireland's startup and innovation ecosystem.",
+            "I'm a recent graduate of Trinity College Dublin's MSc in Entrepreneurship & Innovation. I'm looking for roles in sales and business development (SDR, BDR or account roles), strategy and consulting, or in Ireland's startup and innovation ecosystem.",
             "Longer term, I want to build a venture around an idea that improves how people live and gives back to the community."
           ],
-          tags: ["Consulting", "Strategy", "Business development", "Sales", "Innovation"],
+          tags: ["Sales", "Business development", "Consulting", "Strategy", "Innovation"],
           links: ["tcd"]
         }
         ,{
@@ -202,10 +203,10 @@ window.SITE = {
             "A fast-paced outbound business-to-consumer sales role. I handled cold outreach, follow-ups with VIP clients and a full daily cycle of calls on my own."
           ],
           bullets: [
-            "Converted calls to sales consistently above the team average.",
+            "Reached a 28% conversion rate on cold outreach while averaging 400 calls a day.",
             "Ranked among the top performers in the team's sales competitions."
           ],
-          tags: ["Outbound sales", "B2C", "Client follow-up"],
+          tags: ["Outbound sales", "Cold calling", "B2C", "Client follow-up"],
           links: ["s-sales"]
         },
         {
@@ -240,7 +241,7 @@ window.SITE = {
           title: "Junior Financial Consultant",
           meta: "DVAG · Magdeburg, Germany · Sep – Nov 2021",
           bullets: [
-            "Found and engaged international students and new residents for financial-planning consultations, in a role focused on winning new clients directly."
+            "Took part in a client-acquisition sales team's meetings on financial-planning consultations for international students and new residents."
           ],
           tags: ["Client acquisition", "Financial planning"],
           links: ["s-sales"]
@@ -253,7 +254,7 @@ window.SITE = {
           meta: "AIESEC · Amman, Jordan · Oct 2019 – Feb 2020",
           bullets: [
             "Ran recruitment from start to finish: interviews, team allocation, mediation and offboarding. Also analysed how team leaders organised their work.",
-            "Met a bi-weekly outreach quota and checked every lead against company records and government registries before contacting them.",
+            "Made 40 cold calls a day and worked a bi-weekly outreach quota, checking every lead against company records and government registries before contacting them.",
             "Spotted that the lead pool was out of date and raised it with leadership, which led them to review how the team sourced leads."
           ],
           tags: ["Business development", "Talent management", "Data quality"],
@@ -402,7 +403,8 @@ window.SITE = {
           theme: "violet",
           title: "Sales & client relationships",
           bullets: [
-            "Outbound prospecting, consultative selling and managing a client portfolio.",
+            "Outbound prospecting and cold calling: up to 400 calls a day, with a 28% conversion rate on cold outreach.",
+            "Consultative selling, lead qualification and managing a client portfolio.",
             "Stakeholder management with senior decision-makers."
           ],
           links: ["blackoasis", "dvag", "aiesec", "medal"]
