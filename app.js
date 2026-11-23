@@ -38,9 +38,6 @@
     set(k, v) { try { localStorage.setItem("wa_" + k, JSON.stringify(v)); } catch (_) {} }
   };
   const visited = new Set(store.get("visited", []));
-  const golden = new Set(store.get("gold", []));
-  let played = store.get("played", false);
-  let bestScore = store.get("best", 0);
 
   /* ── Build graph model ── */
   const nodes = [];
@@ -88,7 +85,6 @@
     const cn = byId[c.id];
     cn.angle = a; cn.x = Math.cos(a) * R1; cn.y = Math.sin(a) * R1; cn.r = 56;
   });
-  const GAME_POS = { x: 0, y: R2 + 190 };
 
   /* ── Shapes: each section has its own; its subtopics share it ── */
   function poly(n, r, rot) {
@@ -167,8 +163,6 @@
       g.appendChild(n.stuck);
       g.appendChild(makeShape(n.shape, n.r, { class: "dot", stroke: th.accent }));
       g.appendChild(makeShape(n.shape, 9, { class: "gem", fill: th.tileA }));
-      n.sparkles = svgEl("g", { class: "sparkles", "aria-hidden": "true" });
-      g.appendChild(n.sparkles);
       const below = Math.sin(n.angle) > -0.35;
       const lines = wrap(n.label, 15);
       lines.forEach((ln, i) => {
@@ -211,45 +205,27 @@
       <path d="M${tail + 4},-2.6 H${tail + 9} V-.9 Q${tail + 6.6},-.9 ${tail + 6.6},0 Q${tail + 6.6},.9 ${tail + 9},.9 V2.6 H${tail + 4} Z" fill="#23272D"/>`;
     n.stuck.appendChild(inner);
   }
-  function clearStuckArrows() { items.forEach((n) => { n.stuck.textContent = ""; }); }
-
-  function drawGold(n) {
-    n.el.classList.toggle("gold", golden.has(n.id));
-    n.sparkles.textContent = "";
-    if (!golden.has(n.id)) return;
-    [[-n.r - 6, -n.r - 2, 1], [n.r + 4, -n.r + 6, 0.7], [n.r - 2, n.r + 2, 0.85]].forEach(([x, y, s], i) => {
-      const star = svgEl("path", {
-        d: "M0,-9 C1,-2 2,-1 9,0 C2,1 1,2 0,9 C-1,2 -2,1 -9,0 C-2,-1 -1,-2 0,-9 Z",
-        class: "spark", transform: `translate(${x},${y}) scale(${s})`
-      });
-      star.style.animationDelay = i * 0.6 + "s";
-      n.sparkles.appendChild(star);
-    });
-  }
   function refreshMarks() {
     items.forEach((n) => {
-      if (!played && visited.has(n.id)) { if (!n.stuck.firstChild) drawStuckArrow(n, false); }
+      if (visited.has(n.id)) { if (!n.stuck.firstChild) drawStuckArrow(n, false); }
       else n.stuck.textContent = "";
-      drawGold(n);
     });
     updateProgress();
-    updateGameButton();
+  }
+  function markExplored(n, animate) {
+    visited.add(n.id);
+    store.set("visited", [...visited]);
+    track("tile_explored", { id: n.id, count: visited.size });
+    drawStuckArrow(n, animate);
+    updateProgress();
+    if (visited.size === N) setTimeout(() => toast("You've explored every tile. Thank you for reading! 🎯"), 900);
   }
 
   /* The cursor becomes an arrow that flies into the tile, then the tile opens */
   function shootAndOpen(n, ev) {
-    const isNew = !visited.has(n.id);
-    visited.add(n.id);
-    store.set("visited", [...visited]);
     const open = () => go(routeFor(n), "web");
-    if (played || !isNew) { open(); updateProgress(); return; }
-    track("tile_explored", { id: n.id, count: visited.size });
-    const done = () => {
-      drawStuckArrow(n, true);
-      updateProgress();
-      if (visited.size === N) setTimeout(unlockChallenge, 900);
-    };
-    if (!ev || reduceMotion || typeof ev.clientX !== "number") { done(); open(); return; }
+    if (visited.has(n.id)) { open(); return; }
+    if (!ev || reduceMotion || typeof ev.clientX !== "number") { markExplored(n, true); open(); return; }
     const pt = web.createSVGPoint(); pt.x = n.x; pt.y = n.y;
     const sp = pt.matrixTransform(web.getScreenCTM());
     const dx = sp.x - ev.clientX, dy = sp.y - ev.clientY;
@@ -263,7 +239,7 @@
       { transform: `translate(${ev.clientX - 2 + dx * 0.15}px,${ev.clientY - 2 + dy * 0.15 - 10}px) rotate(${ang}deg) scale(1.5)`, offset: 0.3 },
       { transform: `translate(${sp.x - 2}px,${sp.y - 2}px) rotate(${ang}deg) scale(1)` }
     ], { duration: 420, easing: "cubic-bezier(.5,0,.75,1)" });
-    const finish = () => { fly.remove(); document.body.classList.remove("shooting"); done(); open(); };
+    const finish = () => { fly.remove(); document.body.classList.remove("shooting"); markExplored(n, true); open(); };
     anim.onfinish = finish;
     setTimeout(() => { if (fly.isConnected) finish(); }, 700);
   }
@@ -275,116 +251,8 @@
   pill.addEventListener("click", () => go("#/", "pill"));
   function updateProgress() {
     const v = visited.size;
-    if (played) pill.innerHTML = `🏹 Best score <b>${bestScore.toLocaleString()}</b>`;
-    else if (v >= N) pill.innerHTML = `🎯 <b>${N}/${N}</b> · Challenge unlocked`;
-    else pill.innerHTML = `🎯 <b>${v}/${N}</b> <span class="long">explored</span>`;
-    pill.title = played ? "Your best archery score" : "Open every tile to unlock a challenge";
-  }
-
-  /* ── Challenge button below the web (appears once every tile is open) ── */
-  const gameBtn = svgEl("g", { id: "gameBtn", class: "game-btn", transform: `translate(${GAME_POS.x},${GAME_POS.y})`, tabindex: "0", role: "button", "aria-label": "Take the archery challenge" });
-  gameBtn.innerHTML = `
-    <circle class="ripple" r="62"/><circle class="ripple r2" r="62"/><circle class="ripple r3" r="62"/>
-    <g class="core-g">
-      <circle class="core" r="60"/>
-      <circle r="38" fill="#FFFFFF"/><circle r="29" fill="#1B2440"/><circle r="20" fill="#3A63B8"/><circle r="11" fill="#D32F2F"/><circle r="4" fill="#F5D06A"/>
-    </g>
-    <text class="gb-l1" y="90" text-anchor="middle">Take the challenge</text>
-    <text class="gb-l2" y="110" text-anchor="middle">25 questions · 1 bow</text>`;
-  gameBtn.style.display = "none";
-  $("#nodes").appendChild(gameBtn);
-  const lightsLayer = svgEl("g", { id: "lights" });
-  $("#nodes").appendChild(lightsLayer);
-  gameBtn.addEventListener("click", () => { if (!panMoved) launchChallenge(); });
-  gameBtn.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); launchChallenge(); } });
-  function updateGameButton() {
-    const on = visited.size >= N || played;
-    gameBtn.style.display = on ? "" : "none";
-    gameBtn.querySelector(".gb-l1").textContent = played ? "Play again" : "Take the challenge";
-  }
-
-  function unlockChallenge() {
-    updateGameButton();
-    toast("Every tile explored! A challenge has appeared below the web.");
-    track("challenge_unlocked", {});
-    if (!current || current.type === "home") flyTo(cameraFor({ type: "home", id: "me" }));
-  }
-
-  /* All the stuck arrows turn into lights, swirl into the button, then the game starts */
-  let launching = false;
-  function launchChallenge() {
-    if (launching || !window.ArcheryGame) return;
-    launching = true;
-    track("challenge_start", { replay: played });
-    if (location.hash && location.hash !== "#/") go("#/", "challenge");
-    else flyTo(cameraFor({ type: "home", id: "me" }));
-    setTimeout(swirl, reduceMotion ? 0 : 1150);
-  }
-  function swirl() {
-    const sources = items.filter((n) => visited.has(n.id));
-    clearStuckArrows();
-    const lights = sources.map((n, i) => {
-      const c = svgEl("circle", { r: 7, class: "light" });
-      lightsLayer.appendChild(c);
-      const dx = n.x - GAME_POS.x, dy = n.y - GAME_POS.y;
-      return { el: c, r0: Math.hypot(dx, dy), a0: Math.atan2(dy, dx), delay: (i % 6) * 0.03 };
-    });
-    const dur = reduceMotion ? 10 : 2100, t0 = performance.now();
-    const ease = (t) => t * t * (3 - 2 * t);
-    let ended = false;
-    const end = () => {
-      if (ended) return; ended = true;
-      lightsLayer.textContent = "";
-      gameBtn.classList.add("charged");
-      fadeTo(true, () => {
-        gameBtn.classList.remove("charged");
-        window.ArcheryGame.start({ questions: buildQuestions(), onEnd: gameEnded, onExit: backToWeb, track });
-        fadeTo(false);
-      });
-    };
-    const step = (now) => {
-      const t = Math.min(1, (now - t0) / dur);
-      lights.forEach((L) => {
-        const k = ease(Math.max(0, Math.min(1, (t - L.delay) / (1 - L.delay))));
-        const r = L.r0 * (1 - k), a = L.a0 + 2.6 * Math.PI * k;
-        L.el.setAttribute("cx", GAME_POS.x + Math.cos(a) * r);
-        L.el.setAttribute("cy", GAME_POS.y + Math.sin(a) * r);
-        L.el.setAttribute("r", 7 * (1 - 0.6 * k) + 1);
-      });
-      if (t < 1) requestAnimationFrame(step); else end();
-    };
-    requestAnimationFrame(step);
-    setTimeout(end, dur + 600);
-  }
-
-  const fader = document.createElement("div");
-  fader.id = "fader"; document.body.appendChild(fader);
-  function fadeTo(on, cb) {
-    fader.classList.toggle("on", on);
-    setTimeout(() => cb && cb(), reduceMotion ? 50 : 900);
-  }
-
-  function buildQuestions() {
-    return items.filter((n) => S.quiz && S.quiz[n.id]).map((n) => {
-      const [q, right, ...wrong] = S.quiz[n.id];
-      return { id: n.id, label: n.label, section: byId[n.cat].label, color: THEMES[n.theme].accent, q, right, answers: [right, ...wrong] };
-    });
-  }
-  function gameEnded(result) {
-    played = true;
-    store.set("played", true);
-    result.correctIds.forEach((id) => golden.add(id));
-    store.set("gold", [...golden]);
-    if (result.score > bestScore) { bestScore = result.score; store.set("best", bestScore); }
-  }
-  function backToWeb(result) {
-    fadeTo(true, () => {
-      window.ArcheryGame.hide();
-      launching = false;
-      refreshMarks();
-      fadeTo(false);
-      if (result && result.correct > 0) setTimeout(() => toast(`Your ${result.correct} correct answer${result.correct === 1 ? "" : "s"} now shine gold ✨`), 700);
-    });
+    pill.innerHTML = v >= N ? `🎯 <b>All ${N}</b> <span class="long">explored</span>` : `🎯 <b>${v}/${N}</b> <span class="long">explored</span>`;
+    pill.title = "Tiles you've opened (an arrow marks each one)";
   }
 
   /* ── Toast ── */
@@ -420,7 +288,7 @@
   function boxFor(ids, pad) {
     let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
     ids.forEach((id) => {
-      const n = id === "game" ? { x: GAME_POS.x, y: GAME_POS.y, r: 70, type: "item" } : byId[id];
+      const n = byId[id];
       const extra = n.type === "item" ? 44 : 0;
       x0 = Math.min(x0, n.x - n.r - 60); x1 = Math.max(x1, n.x + n.r + 60);
       y0 = Math.min(y0, n.y - n.r - extra); y1 = Math.max(y1, n.y + n.r + extra + 10);
@@ -570,12 +438,7 @@
       const n = byId[state.id];
       track("node_open", { id: n.id, label: n.label, type: n.type, category: n.cat || n.id, via });
       // Opening a subtopic any other way (list, related chip, deep link) still counts as explored
-      if (n.type === "item" && !visited.has(n.id)) {
-        visited.add(n.id); store.set("visited", [...visited]);
-        if (!played) drawStuckArrow(n, true);
-        updateProgress();
-        if (visited.size === N) setTimeout(unlockChallenge, 900);
-      }
+      if (n.type === "item" && !visited.has(n.id)) markExplored(n, true);
     }
     current = state; openedAt = performance.now();
 
@@ -593,7 +456,6 @@
       const on = !focus || (focus.has(e.a) && focus.has(e.b) && (e.a === state.id || e.b === state.id || state.type === "category"));
       e.el.classList.toggle("dim", !on);
     });
-    gameBtn.classList.toggle("dim", !!focus);
 
     const intro = $("#intro"), panel = $("#panel");
     if (state.type === "home") {
@@ -619,9 +481,7 @@
   function cameraFor(state) {
     const n = byId[state.id];
     if (state.type === "home") {
-      const ids = nodes.map((m) => m.id);
-      if (gameBtn.style.display !== "none") ids.push("game");
-      return camFor(boxFor(ids, 30));
+      return camFor(boxFor(nodes.map((m) => m.id), 30));
     }
     if (state.type === "category") return camFor(boxFor(["me", n.id, ...n.data.items.map((i) => i.id)], 30), 1.25);
     const near = [n.cat, ...(related[n.id] || [])].map((id) => Math.hypot(byId[id].x - n.x, byId[id].y - n.y));
@@ -653,7 +513,7 @@
         <p>${esc(c.summary || "")}</p>
         <ul class="item-list">${c.items.map((it) => `
           <li><button type="button" data-go="${esc(c.id)}/${esc(it.id)}">
-            <strong>${visited.has(it.id) ? "🏹 " : ""}${golden.has(it.id) ? "✨ " : ""}${esc(it.label)}</strong><span>${esc(it.meta || it.title || "")}</span>
+            <strong>${visited.has(it.id) ? "🏹 " : ""}${esc(it.label)}</strong><span>${esc(it.meta || it.title || "")}</span>
           </button></li>`).join("")}
         </ul>`;
     } else {
@@ -663,7 +523,7 @@
       const rel = [...(related[n.id] || [])].map((id) => byId[id]);
       body.innerHTML = `
         ${photoFor(n.id)}
-        <p class="kicker">${esc(cat.label)}${golden.has(n.id) ? ' <span class="gold-badge">✨ Answered correctly</span>' : ""}</p>
+        <p class="kicker">${esc(cat.label)}</p>
         <h2>${esc(it.title || it.label)}</h2>
         ${it.meta ? `<p class="meta">${esc(it.meta)}</p>` : ""}
         ${(it.body || []).map((p) => `<p>${esc(p)}</p>`).join("")}
@@ -681,7 +541,7 @@
 
   $("#panelClose").addEventListener("click", () => go("#/", "panel"));
   document.addEventListener("keydown", (e) => {
-    if (window.ArcheryGame && window.ArcheryGame.isOpen()) return;
+    if (factCard && !factCard.hidden) return;
     if (e.key === "Escape" && !$("#ask").open && current && current.type !== "home") {
       go(current.type === "item" ? "#/" + byId[current.id].cat : "#/", "key");
     }
@@ -845,9 +705,213 @@
     setTimeout(() => { splash.hidden = true; document.body.classList.remove("revealing"); }, 3200);
   }
 
+  /* ── Fun facts: sparkling stars fixed in the web ──
+       A new star appears after every 2 minutes of active reading (5 in total) with a jingle.
+       While a star waits to be clicked, a soft reminder jingle plays at most every 15 seconds
+       (and stops after a few). Arrows at the screen edge point to stars that are out of view. */
+  const FACTS = S.funFacts || [];
+  const REVEAL_EVERY = 120;     // seconds of active reading between stars
+  const REMIND_EVERY = 15000;   // ms between reminder jingles
+  const MAX_REMINDERS = 4;      // per star, so it never nags forever
+  const IDLE_AFTER = 90000;     // ms without any activity = not reading
+  let factsShown = Math.min(store.get("factsShown", 0), FACTS.length);
+  const factsSeen = new Set(store.get("factsSeen", []));
+  let activeSecs = 0, lastActivity = Date.now(), lastJingle = 0, reminders = 0;
+  let muted = store.get("muted", false);
+  const factEls = [];
+  let factCard = null, arrowsBox = null;
+
+  // Stars sit in the gaps between the five sections, between the inner and outer rings
+  function factPositions() {
+    const angs = S.categories.map((c) => byId[c.id].angle).sort((a, b) => a - b);
+    return FACTS.map((_, i) => {
+      const a = angs[i % angs.length], b = angs[(i + 1) % angs.length] + (i + 1 >= angs.length ? Math.PI * 2 : 0);
+      const m = (a + b) / 2, r = 408;
+      return { x: Math.cos(m) * r, y: Math.sin(m) * r };
+    });
+  }
+
+  /* Sound: a short sparkly arpeggio made in the browser (no audio files to load) */
+  let audio = null;
+  function audioCtx() {
+    if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (_) { audio = null; } }
+    if (audio && audio.state === "suspended") audio.resume().catch(() => {});
+    return audio;
+  }
+  ["pointerdown", "keydown"].forEach((t) => window.addEventListener(t, () => { audioCtx(); }, { once: true, capture: true }));
+  function jingle(soft) {
+    if (muted) return;
+    const ac = audioCtx(); if (!ac || ac.state !== "running") return;
+    lastJingle = Date.now();
+    const notes = soft ? [1318.5, 1975.5] : [1318.5, 1661.2, 1975.5, 2637];
+    const vol = soft ? 0.035 : 0.06;
+    notes.forEach((f, i) => {
+      const t = ac.currentTime + i * 0.085;
+      [["sine", 1], ["triangle", 0.35]].forEach(([type, k]) => {
+        const o = ac.createOscillator(), g = ac.createGain();
+        o.type = type; o.frequency.value = f * (type === "triangle" ? 2 : 1);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol * k, t + 0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 0.55);
+        o.connect(g).connect(ac.destination);
+        o.start(t); o.stop(t + 0.6);
+      });
+    });
+  }
+
+  /* Mute toggle in the top bar */
+  const muteBtn = document.createElement("button");
+  muteBtn.type = "button"; muteBtn.className = "icon-btn"; muteBtn.id = "muteBtn";
+  function paintMute() {
+    muteBtn.setAttribute("aria-pressed", String(muted));
+    muteBtn.setAttribute("aria-label", muted ? "Turn fun-fact sounds on" : "Mute fun-fact sounds");
+    muteBtn.title = muted ? "Sounds off" : "Sounds on";
+    muteBtn.innerHTML = muted
+      ? '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zm12.3.3 1.4-1.4L20 10.2l2.3-2.3 1.4 1.4-2.3 2.3 2.3 2.3-1.4 1.4-2.3-2.3-2.3 2.3-1.4-1.4 2.3-2.3z"/></svg>'
+      : '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4zm12.5-.9a5 5 0 0 1 0 7.8l-1.4-1.4a3 3 0 0 0 0-5zm2.8-2.8a9 9 0 0 1 0 13.4l-1.4-1.4a7 7 0 0 0 0-10.6z"/></svg>';
+  }
+  muteBtn.addEventListener("click", () => {
+    muted = !muted; store.set("muted", muted); paintMute();
+    track("sound_toggle", { muted });
+    if (!muted) jingle(true);
+  });
+  paintMute();
+  document.querySelector(".actions").insertBefore(muteBtn, document.querySelector("#askOpen"));
+
+  function initFacts() {
+    if (!FACTS.length) return;
+    const layer = svgEl("g", { id: "facts" });
+    $("#nodes").appendChild(layer);
+    factPositions().forEach((p, i) => {
+      const g = svgEl("g", { class: "fact-star", transform: `translate(${p.x},${p.y})`, tabindex: "0", role: "button", "aria-label": `Fun fact ${i + 1}: ${FACTS[i].title}` });
+      g.innerHTML = `
+        <circle class="fs-glow" r="26"/>
+        <g class="fs-body"><path class="fs-main" d="M0,-20 C2,-5 5,-2 20,0 C5,2 2,5 0,20 C-2,5 -5,2 -20,0 C-5,-2 -2,-5 0,-20 Z"/></g>
+        <path class="fs-mini m1" d="M0,-6 C.6,-1.5 1.5,-.6 6,0 C1.5,.6 .6,1.5 0,6 C-.6,1.5 -1.5,.6 -6,0 C-1.5,-.6 -.6,-1.5 0,-6 Z" transform="translate(19,-17)"/>
+        <path class="fs-mini m2" d="M0,-6 C.6,-1.5 1.5,-.6 6,0 C1.5,.6 .6,1.5 0,6 C-.6,1.5 -1.5,.6 -6,0 C-1.5,-.6 -.6,-1.5 0,-6 Z" transform="translate(-18,15) scale(.8)"/>`;
+      g.style.display = i < factsShown ? "" : "none";
+      g.classList.toggle("seen", factsSeen.has(i));
+      g.addEventListener("click", () => { if (!panMoved) openFact(i); });
+      g.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openFact(i); } });
+      layer.appendChild(g);
+      factEls.push({ el: g, x: p.x, y: p.y });
+    });
+
+    factCard = document.createElement("div");
+    factCard.id = "factCard"; factCard.className = "card fact-card"; factCard.hidden = true;
+    factCard.setAttribute("role", "dialog"); factCard.setAttribute("aria-modal", "false");
+    document.body.appendChild(factCard);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !factCard.hidden) closeFact(); });
+    document.addEventListener("pointerdown", (e) => {
+      if (!factCard.hidden && !factCard.contains(e.target) && !e.target.closest(".fact-star, .fact-arrow")) closeFact();
+    });
+
+    arrowsBox = document.createElement("div");
+    arrowsBox.id = "factArrows";
+    document.body.appendChild(arrowsBox);
+
+    ["pointermove", "pointerdown", "keydown", "wheel", "scroll", "touchstart"].forEach((t) =>
+      window.addEventListener(t, () => { lastActivity = Date.now(); }, { passive: true, capture: true }));
+    setInterval(factTick, 1000);
+    requestAnimationFrame(placeArrows);
+  }
+
+  function factTick() {
+    const reading = !document.hidden && document.hasFocus() && revealed && Date.now() - lastActivity < IDLE_AFTER;
+    if (!reading) return;
+    if (factsShown < FACTS.length && ++activeSecs >= REVEAL_EVERY) {
+      activeSecs = 0;
+      showStar(factsShown);
+    }
+    const waiting = factEls.some((f, i) => i < factsShown && !factsSeen.has(i));
+    if (waiting && reminders < MAX_REMINDERS && Date.now() - lastJingle >= REMIND_EVERY) { reminders++; jingle(true); }
+  }
+
+  function showStar(i) {
+    factsShown = i + 1; store.set("factsShown", factsShown);
+    reminders = 0;
+    const f = factEls[i];
+    f.el.style.display = "";
+    f.el.classList.remove("pop"); void f.el.getBBox(); f.el.classList.add("pop");
+    jingle(false);
+    track("funfact_appear", { n: i + 1 });
+  }
+
+  function openFact(i) {
+    const fact = FACTS[i];
+    factsSeen.add(i); store.set("factsSeen", [...factsSeen]);
+    factEls[i].el.classList.add("seen");
+    const next = factsShown < FACTS.length ? "Another star will appear as you keep reading." : factsSeen.size === FACTS.length ? "You've found all five. Thanks for getting to know me!" : "";
+    factCard.innerHTML = `
+      <button type="button" class="close" aria-label="Close">×</button>
+      <p class="kicker">✨ Fun fact ${i + 1} of ${FACTS.length}</p>
+      <h2>${esc(fact.title)}</h2>
+      <p>${esc(fact.text)}</p>
+      ${next ? `<p class="muted small">${next}</p>` : ""}`;
+    factCard.querySelector(".close").addEventListener("click", closeFact);
+    factCard.hidden = false;
+    factCard.classList.remove("in"); void factCard.offsetWidth; factCard.classList.add("in");
+    factCard.querySelector(".close").focus({ preventScroll: true });
+    track("funfact_open", { n: i + 1, title: fact.title });
+  }
+  function closeFact() { if (factCard) factCard.hidden = true; }
+
+  /* Edge arrows: point towards stars that are waiting but out of view */
+  function placeArrows() {
+    requestAnimationFrame(placeArrows);
+    if (!arrowsBox) return;
+    const wanted = [];
+    if (revealed && !listMode && cam) {
+      const R = screenRect(), ctm = web.getScreenCTM(), box = web.getBoundingClientRect();
+      factEls.forEach((f, i) => {
+        if (i >= factsShown || factsSeen.has(i) || !ctm) return;
+        const pt = web.createSVGPoint(); pt.x = f.x; pt.y = f.y;
+        const s = pt.matrixTransform(ctm);
+        const x0 = box.left + R.x, y0 = box.top + R.y, x1 = x0 + R.w, y1 = y0 + R.h;
+        if (s.x >= x0 + 10 && s.x <= x1 - 10 && s.y >= y0 + 10 && s.y <= y1 - 10) return; // already visible
+        const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, dx = s.x - cx, dy = s.y - cy;
+        const m = 26;
+        const k = Math.min(Math.abs((x1 - x0) / 2 - m) / Math.max(Math.abs(dx), 1e-6), Math.abs((y1 - y0) / 2 - m) / Math.max(Math.abs(dy), 1e-6));
+        wanted.push({ i, x: cx + dx * k, y: cy + dy * k, a: (Math.atan2(dy, dx) * 180) / Math.PI });
+      });
+      // keep markers from piling on top of each other
+      for (let a = 0; a < wanted.length; a++) for (let b = a + 1; b < wanted.length; b++) {
+        const A = wanted[a], B = wanted[b];
+        if (Math.hypot(A.x - B.x, A.y - B.y) < 46) {
+          const vertEdge = Math.abs(A.x - B.x) < Math.abs(A.y - B.y) || Math.abs(A.x - B.x) < 4;
+          if (vertEdge) B.y = A.y + (B.y >= A.y ? 46 : -46); else B.x = A.x + (B.x >= A.x ? 46 : -46);
+        }
+      }
+    }
+    // reuse elements
+    while (arrowsBox.children.length < wanted.length) {
+      const b = document.createElement("button");
+      b.type = "button"; b.className = "fact-arrow";
+      b.innerHTML = '<span class="fa-star">✦</span><span class="fa-tip"></span>';
+      b.addEventListener("click", () => {
+        const i = +b.dataset.i;
+        track("funfact_arrow", { n: i + 1 });
+        if (current && current.type !== "home") go("#/", "fact-arrow");
+        else flyTo(cameraFor({ type: "home", id: "me" }));
+        factEls[i].el.classList.remove("pop"); void factEls[i].el.getBBox(); factEls[i].el.classList.add("pop");
+      });
+      arrowsBox.appendChild(b);
+    }
+    [...arrowsBox.children].forEach((b, j) => {
+      const w = wanted[j];
+      b.hidden = !w;
+      if (!w) return;
+      b.dataset.i = w.i;
+      b.setAttribute("aria-label", "A fun fact is waiting this way");
+      b.style.transform = `translate(${w.x - 20}px, ${w.y - 20}px)`;
+      b.querySelector(".fa-tip").style.transform = `rotate(${w.a}deg)`;
+    });
+  }
+
   /* ── Boot ── */
   applyTheme("home");
   refreshMarks();
+  initFacts();
   setCam(camFor(boxFor(nodes.map((m) => m.id), 30)));
   window.addEventListener("hashchange", render);
   let rz;
@@ -860,5 +924,8 @@
   if (!deepLink && !introSeen) showSplash();
 
   // Small hook so the browser console (and tests) can reset a visitor's progress
-  window.Portfolio = { reset() { ["visited", "gold", "played", "best"].forEach((k) => store.set(k, k === "played" ? false : k === "best" ? 0 : [])); location.reload(); } };
+  window.Portfolio = {
+    reset() { store.set("visited", []); store.set("factsShown", 0); store.set("factsSeen", []); location.reload(); },
+    showNextFact() { if (factsShown < FACTS.length) showStar(factsShown); } // for testing without waiting 2 minutes
+  };
 })();

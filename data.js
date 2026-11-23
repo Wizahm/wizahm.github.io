@@ -491,33 +491,28 @@ window.SITE.photos = {
 };
 
 /*
-  QUIZ for the archery challenge: one question per subtopic.
-  The FIRST answer is the correct one (the game shuffles them).
+  FUN FACTS: sparkling stars appear in the web while people read (one every 2 minutes).
+  Clicking a star shows one of these. Add, remove or reorder freely (the web has room for 5).
 */
-window.SITE.quiz = {
-  story:        ["What does the family name Abu Al Neel mean?", "Father of the Nile", "Son of the Desert", "House of the River"],
-  drive:        ["Which of these is one of Wisam's core strengths?", "Persistence", "Perfectionism", "Risk-taking"],
-  next:         ["When is Wisam available to start?", "Immediately", "In six months", "Next year"],
-  interests:    ["Which sport does Wisam enjoy for its focus and patience?", "Archery", "Golf", "Fencing"],
-  tcd:          ["Which degree did Wisam earn at Trinity College Dublin?", "MSc Entrepreneurship & Innovation", "MBA", "MSc Finance"],
-  gju:          ["What did Wisam study at the German Jordanian University?", "German and English for Business and Communication", "Mechanical Engineering", "Law"],
-  magdeburg:    ["Where did Wisam spend the exchange year?", "Germany", "France", "Spain"],
-  certs:        ["Which academy certified Wisam in export marketing?", "ITC Academy (International Trade Centre)", "WTO Academy", "IMF Institute"],
-  medal:        ["What did Wisam assess at Medal Consulting?", "Whether products were ready to export", "Building safety", "Tax returns"],
-  blackoasis:   ["How did Wisam's sales results at Black Oasis compare?", "Above the team average", "Below the team average", "Exactly average"],
-  avertra:      ["Which roles did Wisam recruit for at Avertra?", "QA, SAP and Product Owner", "Chefs and waiters", "Pilots and cabin crew"],
-  ssip:         ["In which language did Wisam write articles at SSIP in Berlin?", "German", "French", "Spanish"],
-  dvag:         ["Who did Wisam help with financial planning at DVAG?", "International students and new residents", "Retirees", "Large corporations"],
-  aiesec:       ["What did Wisam flag to AIESEC's leadership?", "An out-of-date lead pool", "A budget overspend", "A broken website"],
-  rosemount:    ["What did Wisam build for Rosemount Family Resource Centre?", "A funding strategy", "A mobile app", "A new office layout"],
-  gradguides:   ["Grad Guides connects international students with…", "Verified alumni mentors", "Landlords", "Travel agents"],
-  dealio:       ["What does Dealio offer students?", "Verified food and shopping deals", "Free textbooks", "Part-time jobs"],
-  energy:       ["The Fair Energy Navigator helps households…", "Find and apply for retrofit grants", "Switch electricity supplier", "Sell solar power"],
-  steeple:      ["How did Wisam describe Steeple Group?", "Financially strong, commercially under-accelerated", "About to go bankrupt", "A fast-growing tech startup"],
-  "s-strategy": ["Which framework is in Wisam's strategy toolkit?", "Porter's Five Forces", "Six Sigma", "Kanban"],
-  "s-digital":  ["Which ad platforms has Wisam managed?", "Google Ads and Meta", "TikTok and Snapchat", "Amazon and eBay"],
-  "s-sales":    ["Which style of selling does Wisam practise?", "Consultative selling", "Auctioneering", "Door-to-door only"],
-  "s-research": ["In which two languages does Wisam write research and reports?", "English and German", "French and Spanish", "Italian and Dutch"],
-  "s-tools":    ["Which applicant tracking system has Wisam used?", "Zoho Recruit", "Greenhouse", "Lever"],
-  "s-lang":     ["How many languages does Wisam speak?", "Three", "Two", "Five"]
-};
+window.SITE.funFacts = [
+  {
+    title: "Cup of Positivity",
+    text: "I graduated school with the IB Diploma and the Cup of Positivity award. Proof that optimism can be measured, or at least engraved."
+  },
+  {
+    title: "Composer, briefly",
+    text: "I taught myself enough piano to write an original piece of my own. The piano is on pause; the urge to make music never left."
+  },
+  {
+    title: "One constant on any map",
+    text: "Amman, Dublin or anywhere in between, I'll find the Italian place. Lasagna, pasta or tiramisu, it's the one cuisine I never get tired of."
+  },
+  {
+    title: "An early passport",
+    text: "Before I was a teenager I'd already been to Vienna, Bulgaria, Madrid and Barcelona, plus closer to home in Syria and Lebanon. That's where my habit of comparing how different places work started."
+  },
+  {
+    title: "My rabbit hole",
+    text: "I spend a lot of time on how AI is reshaping creative industries: the line between \"AI slop\" and AI that closes skill gaps without pushing artists out. I'm firmly on the side of the second."
+  }
+];
