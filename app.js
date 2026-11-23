@@ -576,12 +576,9 @@
   /* ── Contact (assembled at runtime to deter scrapers) ── */
   const C = S.person.contact;
   const email = C.emailUser + "@" + C.emailDomain;
-  const phone = C.phoneParts.join("");
-  const lnk = $("#cLinkedin"), em = $("#cEmail"), ph = $("#cPhone");
+  const lnk = $("#cLinkedin"), em = $("#cEmail");
   lnk.href = C.linkedin;
-  ph.href = "tel:" + phone; ph.title = C.phoneParts.join(" ");
-  [[lnk, "linkedin"], [ph, "phone"]].forEach(([el, m]) =>
-    el.addEventListener("click", () => track("contact_click", { method: m, from: current ? current.id : "me" })));
+  lnk.addEventListener("click", () => track("contact_click", { method: "linkedin", from: current ? current.id : "me" }));
 
   /* Email menu: a plain mailto link does nothing for people without a desktop email app,
      so offer Gmail and Outlook on the web as well, plus copy-to-clipboard. */
@@ -706,12 +703,14 @@
   }
 
   /* ── Fun facts: sparkling stars fixed in the web ──
-       A new star appears after every 2 minutes of active reading (5 in total) with a jingle.
+       A new star appears every 20-30 seconds of active reading (5 in total) with a jingle.
        While a star waits to be clicked, a soft reminder jingle plays at most every 15 seconds
        (and stops after a few). Arrows at the screen edge point to stars that are out of view. */
   const FACTS = S.funFacts || [];
   const FIRST_AFTER = 20;       // seconds of reading before the first star
-  const REVEAL_EVERY = 120;     // seconds of active reading between the later stars
+  const REVEAL_MIN = 20, REVEAL_MAX = 30; // seconds of active reading between the later stars (random in this range)
+  const nextGap = () => REVEAL_MIN + Math.floor(Math.random() * (REVEAL_MAX - REVEAL_MIN + 1));
+  let revealGap = nextGap();
   const REMIND_EVERY = 15000;   // ms between reminder jingles
   const MAX_REMINDERS = 4;      // per star, so it never nags forever
   const IDLE_AFTER = 90000;     // ms without any activity = not reading
@@ -820,8 +819,8 @@
   function factTick() {
     const reading = !document.hidden && revealed && Date.now() - lastActivity < IDLE_AFTER;
     if (!reading) return;
-    if (factsShown < FACTS.length && ++activeSecs >= (factsShown === 0 ? FIRST_AFTER : REVEAL_EVERY)) {
-      activeSecs = 0;
+    if (factsShown < FACTS.length && ++activeSecs >= (factsShown === 0 ? FIRST_AFTER : revealGap)) {
+      activeSecs = 0; revealGap = nextGap();
       showStar(factsShown);
     }
     const waiting = factEls.some((f, i) => i < factsShown && !factsSeen.has(i));
@@ -927,6 +926,6 @@
   // Small hook so the browser console (and tests) can reset a visitor's progress
   window.Portfolio = {
     reset() { store.set("visited", []); store.set("factsShown", 0); store.set("factsSeen", []); location.reload(); },
-    showNextFact() { if (factsShown < FACTS.length) showStar(factsShown); } // for testing without waiting 2 minutes
+    showNextFact() { if (factsShown < FACTS.length) showStar(factsShown); } // for testing without waiting
   };
 })();

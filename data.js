@@ -28,8 +28,8 @@ window.SITE = {
     contact: {
       linkedin: "https://www.linkedin.com/in/wisam-abu-al-neel",
       emailUser: "wisamabualneel",
-      emailDomain: "gmail.com",
-      phoneParts: ["+353", "83", "027", "6669"]
+      emailDomain: "gmail.com"
+      // No phone number on the public site (removed 2026-11-23 to keep it away from scrapers).
     }
   },
 
@@ -495,7 +495,7 @@ window.SITE.photos = {
 };
 
 /*
-  FUN FACTS: sparkling stars appear in the web while people read (one every 2 minutes).
+  FUN FACTS: sparkling stars appear in the web while people read (one every 20-30 seconds).
   Clicking a star shows one of these. Add, remove or reorder freely (the web has room for 5).
 */
 window.SITE.funFacts = [
