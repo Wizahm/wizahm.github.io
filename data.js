@@ -187,6 +187,7 @@ window.SITE = {
             "Delivered export-readiness assessments for five companies within a single project, including a women-led food-security initiative.",
             "Designed a scoring framework and a standard assessment template. Management adopted them as the basis for an online self-assessment tool.",
             "Acted as the main point of contact for every company: communications, logistics and scoping solutions.",
+            "Helped secure an exclusive retainer agreement with one of the five companies, making Medal its sole marketing and consulting partner for its UK expansion.",
             "Ran the company's own digital marketing in-house: set up and supervised Google Ads, Meta and Instagram accounts run by an agency partner, and checked results against Google Analytics.",
             "Led on-page SEO for the company website (keyword research, content optimisation and technical fixes)."
           ],
@@ -216,7 +217,8 @@ window.SITE = {
           title: "Junior Talent Specialist (contract)",
           meta: "Avertra Corp. · Amman, Jordan · Mar – May 2023",
           bullets: [
-            "Sourced and interviewed candidates for QA, SAP, Talent Acquisition and Product Owner roles, in Jordan and remotely, through LinkedIn.",
+            "Interviewed 7 candidates a day in 30-minute interviews, each followed by 30 minutes of documentation.",
+            "Sourced candidates through LinkedIn for QA, SAP, Talent Acquisition and Product Owner roles, in Jordan and remotely.",
             "Managed candidates in Zoho Recruit, an applicant tracking system."
           ],
           tags: ["Recruitment", "Zoho Recruit", "Interviewing"],
