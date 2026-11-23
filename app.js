@@ -710,7 +710,8 @@
        While a star waits to be clicked, a soft reminder jingle plays at most every 15 seconds
        (and stops after a few). Arrows at the screen edge point to stars that are out of view. */
   const FACTS = S.funFacts || [];
-  const REVEAL_EVERY = 120;     // seconds of active reading between stars
+  const FIRST_AFTER = 20;       // seconds of reading before the first star
+  const REVEAL_EVERY = 120;     // seconds of active reading between the later stars
   const REMIND_EVERY = 15000;   // ms between reminder jingles
   const MAX_REMINDERS = 4;      // per star, so it never nags forever
   const IDLE_AFTER = 90000;     // ms without any activity = not reading
@@ -817,9 +818,9 @@
   }
 
   function factTick() {
-    const reading = !document.hidden && document.hasFocus() && revealed && Date.now() - lastActivity < IDLE_AFTER;
+    const reading = !document.hidden && revealed && Date.now() - lastActivity < IDLE_AFTER;
     if (!reading) return;
-    if (factsShown < FACTS.length && ++activeSecs >= REVEAL_EVERY) {
+    if (factsShown < FACTS.length && ++activeSecs >= (factsShown === 0 ? FIRST_AFTER : REVEAL_EVERY)) {
       activeSecs = 0;
       showStar(factsShown);
     }
