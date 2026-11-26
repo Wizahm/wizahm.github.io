@@ -272,7 +272,7 @@ window.SITE = {
       theme: "coral",
       shape: "square",
       summary:
-        "My MSc capstone with a real client, plus ventures and analyses from my coursework. All were team projects except the Steeple valuation.",
+        "My MSc capstone with a real client, plus ventures, strategies and analyses from my coursework. Most were team projects; StreamEase and the Steeple valuation were my own.",
       items: [
         {
           id: "rosemount",
@@ -308,7 +308,28 @@ window.SITE = {
             "Growth plan: a campus ambassador programme, a 24-hour first match, SEO content on LinkedIn and Rednote, then licensing to other universities as a business-to-business product."
           ],
           tags: ["Design thinking", "Prototyping", "User research", "AARRR growth", "B2B2C"],
-          links: ["tcd", "s-digital", "dealio"]
+          links: ["tcd", "s-digital", "dealio", "alex"]
+        },
+        {
+          id: "alex",
+          label: "Anxious Alex",
+          theme: "coral",
+          title: "Anxious Alex Abroad: the persona behind Grad Guides",
+          meta: "Digital Entrepreneurship & Scaling · my part of the Grad Guides team project",
+          body: [
+            "To design Grad Guides around a real person rather than a feature list, I created Alex: an international student who lands in Dublin with a suitcase and a knot in their stomach. Visa rules, a job market that feels frozen, rent and deadlines all swirl at once, and everyone else seems to have a handbook Alex never received.",
+            "I then mapped Alex's journey with the app across five stages (awareness, consideration, sign-up, onboarding and advocacy) and tracked what Alex does, where they meet the brand, how they feel and where they get stuck at each step."
+          ],
+          bullets: [
+            "Emotion curve: from stressed and anxious on arrival, through a dip when the first mentor chat stalls, to telling friends about the app.",
+            "Pain points I found: Alex has never heard of Grad Guides, doesn't trust it yet, is uneasy signing up with a university email, and doesn't know how to keep a mentor conversation going.",
+            "Solutions I proposed for each one: partnering with universities so students meet the app before they arrive, introducing it through university websites and webinars, signing up with a student number instead of an email, and suggested conversation prompts above the keyboard."
+          ],
+          figures: [
+            { file: "img/anxious-alex-journey.png", alt: "User journey map for Anxious Alex across awareness, consideration, sign-up, onboarding and advocacy", caption: "The user journey map I built for Alex. Open it full size to read every step." }
+          ],
+          tags: ["Persona", "User journey mapping", "Pain points", "Design thinking", "UX"],
+          links: ["gradguides", "s-research"]
         },
         {
           id: "dealio",
@@ -330,9 +351,9 @@ window.SITE = {
         },
         {
           id: "energy",
-          label: "Fair Energy Navigator",
+          label: "Granted",
           theme: "coral",
-          title: "Fair Energy Navigator: no household left behind",
+          title: "Granted: no household left behind",
           meta: "Social & Sustainable Entrepreneurship · team pitch to a mock investment committee",
           body: [
             "Ireland funds home energy retrofits, but the households who need them most rarely get them. Many low-income households don't know the grants exist, the schemes overlap and contradict each other, and waiting lists run to years. The problem isn't motivation; it's navigation.",
@@ -346,6 +367,78 @@ window.SITE = {
           ],
           tags: ["Social enterprise", "Theory of Change", "Outcome contracts", "Scaling", "Funding mix"],
           links: ["rosemount", "s-strategy"]
+        },
+        {
+          id: "zapsight",
+          label: "AI startup growth strategy",
+          theme: "coral",
+          title: "Growth strategy for an AI commerce startup",
+          meta: "Corporate Innovation · team project with a real startup and its founders",
+          body: [
+            "We worked with a real AI commerce startup that sold four different products to large retailers. (I've left out the company's name, clients and figures.) The founders asked for a growth strategy; our honest diagnosis was that the startup was doing bespoke work for each client and calling it a platform, so it couldn't grow without the founders in every deal.",
+            "We found one product that solved a gap the big software vendors hadn't: putting a shopper's online behaviour in front of the in-store sales associate at the moment of purchase. We built the strategy around it."
+          ],
+          bullets: [
+            "Strategy 1, depth before width: deepen that one product inside the existing anchor clients and prove a repeatable playbook.",
+            "Strategy 2, vertical copy-paste: roll the same playbook out to similar high-consideration retailers.",
+            "Precondition for both: turn the product into a real product first, with the same pricing, onboarding and deployment for every client, and no founder needed in the room.",
+            "My part: I checked the founders' answers against my interview notes so our revised strategy rested on what they actually said, worked with a teammate on the narrowed strategy, and built the Gantt chart that sequenced it.",
+            "In my individual review I reframed the bottleneck with Ansoff's Matrix as a market-penetration problem, and proposed a two-part enterprise price: a paid onboarding fee plus an annual subscription tied to results the client can measure."
+          ],
+          tags: ["Growth strategy", "Founder interviews", "Ansoff Matrix", "Productisation", "B2B pricing", "Gantt chart"],
+          links: ["s-strategy", "s-sales", "astrolytix"]
+        },
+        {
+          id: "astrolytix",
+          label: "Astrolytix",
+          theme: "coral",
+          title: "Astrolytix: space data as a service",
+          meta: "Strategic Entrepreneurship · team of six",
+          body: [
+            "With more than 10,000 active satellites in orbit, space is getting crowded, and the tracking data operators rely on is split across governments and private companies that don't share formats. Astrolytix is our concept for a neutral, global layer: it fuses that data, adds AI to predict collisions in real time, and delivers it as compliance-ready APIs for satellite operators, insurers and regulators."
+          ],
+          bullets: [
+            "Analysed the industry with PESTEL, Porter's Five Forces, the industry lifecycle and a competitor review. The opening: no neutral, global data aggregator exists yet.",
+            "Designed the business model on a Business Model Canvas and tested its resources with VRIO. The real challenge isn't technology but earning trust from rivals, governments and operators at the same time.",
+            "Growth plan: build credibility through regulators in Europe and partnerships in Asia-Pacific, build security and compliance in from day one, then embed in customers' workflows through APIs and tiered subscriptions.",
+            "My part of the pitch: market opportunities and challenges, the Business Model Canvas, the VRIO analysis and the closing."
+          ],
+          tags: ["Industry analysis", "PESTEL", "Porter's Five Forces", "VRIO", "Business Model Canvas", "Pitching"],
+          links: ["s-strategy", "zapsight"]
+        },
+        {
+          id: "studycircle",
+          label: "StudyCircle sprint",
+          theme: "coral",
+          title: "StudyCircle: a one-week design sprint that came first",
+          meta: "Design Thinking & Agile Development · team of six · 1st place",
+          body: [
+            "In one block week our team had to take an idea from problem to clickable prototype, manage the work in Jira, and pitch it. The day before the pitch it fell apart: the prototype was scrapped and the deck wasn't working. Our team lead sent everyone home to rest, we rebuilt everything that evening, rehearsed the next morning, and won 1st place."
+          ],
+          bullets: [
+            "My part: gathered and submitted the user feedback, built the user journey for the rebuilt prototype, helped with the presentation and rehearsed my section overnight.",
+            "What I took from it: read the brief and the required tools before the week starts, map each tool to a deliverable, agree the plan with the team early, and share work out so nobody is left without a role."
+          ],
+          tags: ["Design sprint", "Agile", "Jira", "Prototyping", "User feedback", "Pitching"],
+          links: ["streamease", "alex"]
+        },
+        {
+          id: "streamease",
+          label: "StreamEase",
+          theme: "coral",
+          title: "StreamEase: ending choice fatigue on Netflix",
+          meta: "Design Thinking & Agile Development · individual project",
+          body: [
+            "After a long day, people spend more time scrolling Netflix than watching it. I applied the full design-thinking process to this problem and designed StreamEase, a companion app that gets you to something worth watching in under 30 seconds."
+          ],
+          bullets: [
+            "Research: interviewed three Netflix users from different generations and built a persona, \"Decision-Drained Dana\", plus a design brief and design criteria.",
+            "Concept: swipe-style short previews, recommendations based on your mood and how much time you have, an AI chat assistant, and a group mode where friends join with a code and vote on what to watch.",
+            "Business model: a Business Model Canvas aimed at busy professionals, Gen Z viewers and people who watch together.",
+            "Testing: wrote a learning guide with the assumptions to test (for example, whether users will connect their Netflix account to another app) and a plan for usability sessions measuring time to choose and satisfaction."
+          ],
+          tags: ["Design thinking", "Persona", "\"How might we\"", "Business Model Canvas", "UX concept"],
+          links: ["studycircle", "gradguides"]
         },
         {
           id: "steeple",
@@ -485,6 +578,12 @@ window.SITE.photos = {
   gradguides:   { src: "photo-1761781342506-30f68c930a16", user: "ethan_gowans", page: "graduation-ceremony-with-students-in-blue-caps-and-gowns-NXnX56qv2c0", alt: "Students at a graduation ceremony" },
   dealio:       { src: "photo-1753351057311-8fd3c46bc4e2", user: "silverkblack", page: "friends-are-sharing-pizza-and-conversation-at-a-restaurant-Isbx9diUnhU", alt: "Friends sharing pizza" },
   energy:       { src: "photo-1607400201889-565b1ee75f8e", user: "introspectivedsgn", page: "person-installing-wiring-in-wall-insulation-aCshJn3y93s", alt: "Insulation being fitted in a wall" },
+  // `file` = a picture of my own in img/ (shown with its caption instead of an Unsplash credit)
+  alex:         { file: "img/anxious-alex.jpg", alt: "Illustration of Alex, an international student arriving in the rain with a suitcase and worried thoughts", caption: "Alex, the persona I created for Grad Guides." },
+  zapsight:     { src: "photo-1743228672550-8b8f22cf0031", user: "albertstoynov", page: "inside-of-a-department-store-with-clothes-on-display-XmfAjdvSZIU", alt: "Inside a department store" },
+  astrolytix:   { src: "photo-1446776811953-b23d57bd21aa", user: "nasa", page: "view-of-earth-and-satellite-yZygONrUBe8", alt: "A satellite above the Earth" },
+  studycircle:  { src: "photo-1586936893354-362ad6ae47ba", user: "uxindo", page: "team-collaborating-with-sticky-notes-w00FkE6e8zE", alt: "A team working with sticky notes" },
+  streamease:   { src: "photo-1584905066893-7d5c142ba4e1", user: "introspectivedsgn", page: "person-holding-black-remote-control-U-Vu_r6qyyU", alt: "Someone holding a TV remote" },
   steeple:      { src: "photo-1760611656148-063d3b9a8dbc", user: "davidkristianto", page: "various-chairs-displayed-in-a-showroom-setting-rItWuQHaOpM", alt: "Chairs in a furniture showroom" },
   "s-strategy": { src: "photo-1528819622765-d6bcf132f793", user: "felix_mittermeier", page: "chess-pieces-on-board-nAjil1z3eLk", alt: "Chess pieces on a board" },
   "s-digital":  { src: "photo-1666875753105-c63a6f3bdc86", user: "dengxiangs", page: "graphical-user-interface--WXQm_NTK0U", alt: "An analytics dashboard" },

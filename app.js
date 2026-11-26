@@ -70,7 +70,7 @@
   });
 
   /* ── Layout: every subtopic sits evenly on ONE circle; each section sits at the middle of its group ── */
-  const R1 = 265, R2 = 545;
+  const R1 = 300, R2 = 640; // R2 grown from 545 when Projects went from 5 to 10 tiles, so labels keep their spacing
   const N = items.length;
   const first = S.categories[0].items.length;
   byId.me.x = 0; byId.me.y = 0; byId.me.r = 78;
@@ -492,6 +492,10 @@
   function photoFor(id) {
     const p = S.photos && S.photos[id];
     if (!p) return "";
+    if (p.file) return `<figure class="photo">
+        <img src="${esc(p.file)}" alt="${esc(p.alt || "")}" loading="lazy" width="840" height="420">
+        ${p.caption ? `<figcaption>${esc(p.caption)}</figcaption>` : ""}
+      </figure>`;
     const ref = "?utm_source=wizahm_portfolio&utm_medium=referral";
     return `<figure class="photo">
         <img src="https://images.unsplash.com/${esc(p.src)}?auto=format&fit=crop&w=840&h=420&q=70" alt="${esc(p.alt || "")}" loading="lazy" width="840" height="420">
@@ -528,6 +532,10 @@
         ${it.meta ? `<p class="meta">${esc(it.meta)}</p>` : ""}
         ${(it.body || []).map((p) => `<p>${esc(p)}</p>`).join("")}
         ${it.bullets ? `<ul>${it.bullets.map((b) => `<li>${esc(b)}</li>`).join("")}</ul>` : ""}
+        ${(it.figures || []).map((f) => `<figure class="photo full">
+          <a href="${esc(f.file)}" target="_blank" rel="noopener" title="Open full size"><img src="${esc(f.file)}" alt="${esc(f.alt || "")}" loading="lazy"></a>
+          ${f.caption ? `<figcaption>${esc(f.caption)}</figcaption>` : ""}
+        </figure>`).join("")}
         ${it.tags ? `<div class="tags">${it.tags.map((t) => `<span class="tag">${esc(t)}</span>`).join("")}</div>` : ""}
         ${rel.length ? `<p class="section-label">Connected to</p><div class="related">${rel.map((r) =>
           `<button class="chip" type="button" data-go="${esc(r.cat)}/${esc(r.id)}" style="--chip:${THEMES[r.theme].accent}">${esc(r.label)}</button>`).join("")}</div>` : ""}
@@ -726,7 +734,7 @@
     const angs = S.categories.map((c) => byId[c.id].angle).sort((a, b) => a - b);
     return FACTS.map((_, i) => {
       const a = angs[i % angs.length], b = angs[(i + 1) % angs.length] + (i + 1 >= angs.length ? Math.PI * 2 : 0);
-      const m = (a + b) / 2, r = 408;
+      const m = (a + b) / 2, r = 470;
       return { x: Math.cos(m) * r, y: Math.sin(m) * r };
     });
   }

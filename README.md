@@ -25,6 +25,11 @@ Every tile has its own address, and opening it zooms straight in:
 - `/#/projects/gradguides`
 - `/#/projects/energy`
 - `/#/projects/steeple`
+- `/#/projects/alex` (Anxious Alex persona and journey map)
+- `/#/projects/zapsight` (AI startup growth strategy, anonymised)
+- `/#/projects/astrolytix`
+- `/#/projects/studycircle`
+- `/#/projects/streamease`
 - `/#/experience/medal`
 - `/#/projects/rosemount`
 - `/#/about/story`
